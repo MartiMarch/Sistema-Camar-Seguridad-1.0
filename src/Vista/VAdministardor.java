@@ -1,7 +1,12 @@
 package Vista;
 
+import ComponentesBasicos.JBButton;
+import ComponentesBasicos.JBIconButton;
 import ComponentesBasicos.JBScrollPane;
+import ComponentesBasicos.JBSeparator;
+import ComponentesBasicos.JBTextField;
 import Controlador.Controlador;
+import Modelo.Camara;
 import java.awt.AWTException;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -15,11 +20,12 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 import javax.swing.WindowConstants;
 
 public class VAdministardor extends javax.swing.JFrame {
@@ -62,20 +68,12 @@ public class VAdministardor extends javax.swing.JFrame {
         this.boton_añadirCamara.setFocusable(false);
         this.boton_añadirCamara.setFocusable(false);  
         
-        /*
-        //JtPaneles
-        this.actualizarPanelCamaras();
-        this.subapartados.setFocusable(false);
-        actualizarPanelVideos();
-        */
         
-        /*
-        //listeners
-        ListenerInsertarURL liURL = new ListenerInsertarURL(this.controlador, this);
-        ac = new AñadirCamara(liURL);
-        liURL.setVentana(ac);
-        this.menuItem_modificarRuta.addActionListener(new ListenerCambiarRuta(this.controlador, mr));
-        */
+        //JtPaneles
+        actualizarPanelCamaras();
+        subapartados.setFocusable(false);
+        //actualizarPanelVideos();
+        
     }
     
     
@@ -86,7 +84,7 @@ public class VAdministardor extends javax.swing.JFrame {
         this.systemtray = SystemTray.getSystemTray();
     }
     
-    /*
+    
     public void actualizarPanelCamaras() throws SQLException, InterruptedException
     {
         ArrayList<JPanel> filas = rellenarFilasCamaras();
@@ -108,375 +106,100 @@ public class VAdministardor extends javax.swing.JFrame {
         panel_lista_camaras.setLayout(new BorderLayout());
         panel_lista_camaras.add(scrollPane);
     }
-    */
     
-    /*
     public ArrayList<JPanel> rellenarFilasCamaras() throws SQLException, InterruptedException
     {
        
         ArrayList<JPanel> filas = new ArrayList<JPanel>();
-        ArrayList<Camara> camaras = this.controlador.getScs().getCamaras();
+        ArrayList<Camara> camaras = this.controlador.getCamaras();
         JPanel panel_fila;
-        Encriptador e = new Encriptador();
         
         for(int i = 0; i < camaras.size(); ++i)
         {   
-            if(camaras.get(i).getActive_camera_users().contains(usuario.getName()) ||
-               camaras.get(i).getDeactivated_camera_users().contains(usuario.getName()))
-            {
-                panel_fila = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 15));
-                panel_fila.setBackground(new Color(127,127,127));
-                
-                //Texto - nombre camara
-                JBTextField nombre_camara = new JBTextField(e.desencriptar(camaras.get(i).getName_of_camera().get(this.usuario.getName()), this.usuario.getClaveInvitado()));
-                nombre_camara.setPreferredSize(new Dimension(120, 30));
-                panel_fila.add(nombre_camara);
+            panel_fila = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 15));
+            panel_fila.setBackground(new Color(127,127,127));
 
-                //Boton - renombrar
-                JBButton boton_renombrar = new JBButton("Renombrar");
-                boton_renombrar.addActionListener(new ListenerRenombrarCamara(nombre_camara, camaras.get(i).getUrl(), (Default) this.controlador.getUsuario(), controlador.getScs()));
-                panel_fila.add(boton_renombrar);
-                
-                //Boton - visualizar
-                JBButton boton_visualizar = new JBButton("Visualizar");
-                boton_visualizar.addActionListener(new ListenerVisualizarCamara(camaras.get(i).getUrl(), this.usuario));
-                panel_fila.add(boton_visualizar);
-                
-                //RadioButton - activacion camara
-                JBRadioButton radioButton_activacionCamara = new JBRadioButton();
-                if(camaras.get(i).getActive_camera_users().contains(usuario.getName())){
-                    radioButton_activacionCamara.setText("Cámara activada");
-                    radioButton_activacionCamara.setSelected(true);
-                }
-                else{
-                    radioButton_activacionCamara.setText("Cámara desactivada");
-                    radioButton_activacionCamara.setSelected(false);
-                }   
-                radioButton_activacionCamara.addActionListener(new ListenerCambiarEstadoCamara(this.controlador, camaras.get(i).getUrl(), radioButton_activacionCamara, this.usuario));
-                panel_fila.add(radioButton_activacionCamara);
-                 
-                //RadioButton - activacion alarma
-                JBRadioButton radioButton_activacionAlarma = new JBRadioButton();
-                if(camaras.get(i).getActive_alarm_users().contains(usuario.getName())){
-                    radioButton_activacionAlarma.setText("Alarma activada");
-                    radioButton_activacionAlarma.setSelected(true);
-                }
-                else{
-                    radioButton_activacionAlarma.setText("Alarma desactivada");
-                    radioButton_activacionAlarma.setSelected(false);
-                }
-                radioButton_activacionAlarma.addActionListener(new ListenerCambiarEstadoAlarma(this.controlador, camaras.get(i).getUrl(), radioButton_activacionAlarma, this.usuario));
-                panel_fila.add(radioButton_activacionAlarma);
-                
-                //Boton - eliminar
-                JBIconButton eliminar = new JBIconButton(new ImageIcon(System.getProperty("user.dir") + "\\src\\Imagenes\\boton_eliminar.png"));
-                eliminar.addActionListener(new ListenerEliminarCamara(this, camaras.get(i).getUrl(), usuario, controlador.getScs()));
-                panel_fila.add(eliminar);
-                filas.add(panel_fila);
-                
-                //Separador
-                panel_fila = new JPanel();
-                JBSeparator s = new JBSeparator();
-                panel_fila.setBackground(new Color(127,127,127));
-                panel_fila.add(s);
-                
-                filas.add(panel_fila);
+            panel_fila.add(Box.createRigidArea(new Dimension(5, 0)));
+            Pattern patron = Pattern.compile("(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3}).(\\d{1,3})");
+            Matcher matcher = patron.matcher(camaras.get(i).getURL());
+            String ip = "";
+            while(matcher.find())
+            {
+                ip += matcher.group();
             }
+            JBTextField nombre_camara = new JBTextField(ip);
+            nombre_camara.setPreferredSize(new Dimension(120, 30));
+            panel_fila.add(nombre_camara);
+
+            //Boton - visualizar
+            panel_fila.add(Box.createRigidArea(new Dimension(10, 0)));
+            JBButton boton_visualizar = new JBButton("Visualizar");
+            boton_visualizar.addActionListener(new ListenerVisualizarCamara(camaras.get(i).getURL(), controlador));
+            panel_fila.add(boton_visualizar);
+
+            //Boton - eliminar
+            panel_fila.add(Box.createRigidArea(new Dimension(40, 0)));
+            JBIconButton eliminar = new JBIconButton(new ImageIcon(System.getProperty("user.dir") + "\\src\\Imagenes\\boton_eliminar.png"));
+            eliminar.addActionListener(new ListenerEliminarCamara(camaras.get(i).getURL(), controlador));
+            panel_fila.add(eliminar);
+            filas.add(panel_fila);
+
+            //Separador
+            panel_fila = new JPanel();
+            JBSeparator s = new JBSeparator();
+            panel_fila.setBackground(new Color(127,127,127));
+            panel_fila.add(s);
+
+            filas.add(panel_fila);   
         }
         return filas;
     }
-    */
-
-    /*
-    public String getNombre()
-    {
-        return this.controlador.getUsuario().getName();
-    }
     
-    public JPanel getPanel_lista_camaras() {
-        return panel_lista_camaras;
-    }
-    
-
-    class ListenerInsertarURL implements ActionListener{
-        private SistemaCamarasSeguridad scs;
-        private Modelo_Usuario usuario;
-        private Usuario ventana;
-        private AñadirCamara ac;
+    class ListenerVisualizarCamara implements ActionListener{
+        private String url;
+        private Controlador controlador;
         
-        public ListenerInsertarURL(Controlador controlador, Usuario ventana)
+        public ListenerVisualizarCamara(String url, Controlador controlador) throws InterruptedException
         {
-            this.scs = controlador.getScs();
-            this.usuario = controlador.getUsuario();
-            this.ventana = ventana;
+            this.url = url;
+            this.controlador = controlador;
         }
-        
-        public void setVentana(AñadirCamara ac)
-        {
-            this.ac = ac;
-            this.ac.dispose();
-        }
-        
+         
         @Override
-        public void actionPerformed(ActionEvent e)
+        public void actionPerformed(ActionEvent e) 
         {
-            try{
-                if(usuario.addCamera(ac.getURL(), scs))
-                {
-                    ventana.actualizarPanelCamaras();
-                    ac.setVisible(false);
-                    ac.clearEntrada_url();
-                    ac.dispose();
-                    controlador.añadirMOVCamara(ac.getURL());
-                }
+            try {
+                controlador.visualizarCamara(url);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(VAdministardor.class.getName()).log(Level.SEVERE, null, ex);
             }
-            catch(SQLException s) {System.out.println(s);}
-            catch (InterruptedException ex) {System.out.println(ex);}
-        }
-    }
-    
-    class ListenerRenombrarCamara implements ActionListener{
-        private JTextField texto_field;
-        private String url;
-        private Default def;
-        private RenombrarCamara rc;
-        private SistemaCamarasSeguridad scs;
-        
-        public ListenerRenombrarCamara(JTextField texto_field, String url, Default def, SistemaCamarasSeguridad scs)
-        {
-            this.texto_field = texto_field;
-            this.url = url;
-            this.def = def;
-            this.scs = scs;
-        }
-        
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            rc = new RenombrarCamara(texto_field, url, def, scs);
-            rc.setVisible(true);
-        }
-    }
-    
-    class ListenerCambiarEstadoCamara implements ActionListener{
-        private Controlador controlador;
-        private String url;
-        private JBRadioButton estado_camara;
-        private Modelo_Usuario usuario;
-        
-        public ListenerCambiarEstadoCamara(Controlador controlador, String url, JBRadioButton estado_camara, Modelo_Usuario usuario)
-        {
-            this.controlador = controlador;
-            this.url = url;
-            this.estado_camara = estado_camara;
-            this.usuario = usuario;
-        }
-        
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            controlador.cameraController(url, estado_camara);
-        }
-    }
-    
-    class ListenerCambiarEstadoAlarma implements ActionListener{
-        private Controlador controlador;
-        private String url;
-        private JBRadioButton estado_alarma;
-        private Modelo_Usuario usuario;
-        
-        public ListenerCambiarEstadoAlarma(Controlador controlador, String url, JBRadioButton estado_alarma, Modelo_Usuario usuario)
-        {
-            this.controlador = controlador;
-            this.url = url;
-            this.estado_alarma = estado_alarma;
-            this.usuario = usuario;
-        }
-        
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            controlador.alarmController(url, estado_alarma);
         }
     }
     
     class ListenerEliminarCamara implements ActionListener{
-        private Usuario ventana;
         private String url;
-        private Modelo_Usuario usuario;
-        private SistemaCamarasSeguridad scs;
+        private Controlador controlador;
         
-        public ListenerEliminarCamara(Usuario ventana, String url, Modelo_Usuario usuario, SistemaCamarasSeguridad scs)
+        public ListenerEliminarCamara(String url, Controlador controlador)
         {
-            this.ventana = ventana;
+            this.controlador = controlador;
             this.url = url;
-            this.usuario = usuario;
-            this.scs = scs;
         }
         
         @Override
-        public void actionPerformed(ActionEvent e) {
-            usuario.deleteCamera(url, scs);
+        public void actionPerformed(ActionEvent e) 
+        {
             try {
-                ventana.actualizarPanelCamaras();
-            }
-            catch(SQLException ex){
-                Logger.getLogger(Usuario.class.getName()).log(Level.SEVERE, null, ex);
+                controlador.eliminarCamara(url);
+            } catch (SQLException ex) {
+                Logger.getLogger(VAdministardor.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (ClassNotFoundException ex) {
+                Logger.getLogger(VAdministardor.class.getName()).log(Level.SEVERE, null, ex);
             } catch (InterruptedException ex) {
-                Logger.getLogger(Usuario.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(VAdministardor.class.getName()).log(Level.SEVERE, null, ex);
             }
         }  
     }
-    
-    class ListenerVisualizarCamara implements ActionListener{
-        private Modelo_Usuario usuario;
-        private String url;
-        
-        public ListenerVisualizarCamara(String url, Modelo_Usuario usuario) throws InterruptedException
-        {
-            this.url = url;
-            this.usuario = usuario;
-        }
-         
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            try{
-                controlador.seeCamera(url);
-            }
-            catch(SQLException s) {System.out.println(s);}
-            catch (InterruptedException ex) {System.out.println(ex);}
-        }    
-    }
-    
-    class ListenerCambiarRuta implements ActionListener{
-        private ModifcarRuta mr;
-        private Controlador controlador;
-        
-        public ListenerCambiarRuta(Controlador controlador, ModifcarRuta mr)
-        {
-            this.mr = mr;
-            this.controlador = controlador;
-        }
-        
-        @Override
-        public void actionPerformed(ActionEvent e)
-        {
-            controlador.getV_usuario().setVisible(true);
-            mr.setVisible(true);
-            mr.setControlador(controlador);
-        }
-    }
-    
-    public void actualizarPanelVideos()
-    {
-        ArrayList<JPanel> filas = rellenarFilasVideos();
-        JPanel panel = new JPanel();
-        panel.setBackground(new Color(127,127,127));
-        panel.setLayout(new BoxLayout( panel, BoxLayout.Y_AXIS));
-        for(int i = 0; i < filas.size(); ++i)
-        {
-            filas.get(i).setMaximumSize(filas.get(i).getPreferredSize());
-            filas.get(i).setAlignmentX(LEFT_ALIGNMENT);
-            panel.add(filas.get(i));
-        }
-        panel.revalidate();
-        panel.repaint();
-        JBScrollPane scrollPane = new JBScrollPane(panel);
-        panel_lista_videos.removeAll();
-        panel_lista_videos.revalidate();
-        panel_lista_videos.repaint();
-        panel_lista_videos.setLayout(new BorderLayout());
-        panel_lista_videos.add(scrollPane);
-    }
-    
-    public ArrayList<JPanel> rellenarFilasVideos()
-    {
-        ArrayList<JPanel> filas = new ArrayList<>();  
-        ArrayList<Video> videos = controlador.getScs().getVideos();
-        JPanel panelFila;
-        Encriptador e = new Encriptador();
-
-        for(int i = 0; i < videos.size(); ++i)
-        {      
-            for(int j = 0; j < videos.get(i).getNombresRutas().size(); j++)
-            {
-                if(videos.get(i).getNombresRutas().get(j).getNombre().equals(usuario.getName()))
-                {
-                    panelFila = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 15));
-                    panelFila.setBackground(new Color(127,127,127));
-
-                    //Texto - fecha
-                    String idVideo = videos.get(i).getId().substring(0, videos.get(i).getId().length()-4);
-                    idVideo = idVideo.replaceAll("_", ":");
-                    JBTextField id = new JBTextField(idVideo);
-                    id.setPreferredSize(new Dimension(videos.get(i).getId().length()*8, 30));
-                    panelFila.add(id);
-
-                    //Boton - visualizar
-                    JBButton botonVisualizar = new JBButton("Visualizar");
-                    String ruta = videos.get(i).getNombresRutas().get(j).getRuta();
-                    ruta = e.desencriptar(ruta, usuario.getClaveInvitado());
-                    botonVisualizar.addActionListener(new ListenerVisualizarVideo(ruta));
-                    panelFila.add(botonVisualizar);
-                    panelFila.add(Box.createHorizontalStrut(25));
-
-                    //Boton - eliminar
-                    JBIconButton eliminar = new JBIconButton(new ImageIcon(System.getProperty("user.dir") + "\\src\\Imagenes\\boton_eliminar.png"));
-                    eliminar.addActionListener(new ListenerEliminarVideo(videos.get(i).getId(), controlador.getScs(), ruta, this));
-                    panelFila.add(eliminar);
-
-                    filas.add(panelFila);
-
-                    //Separador
-                    panelFila = new JPanel();
-                    JBSeparator s = new JBSeparator();
-                    panelFila.setBackground(new Color(127,127,127));
-                    panelFila.add(s);
-
-                    filas.add(panelFila);
-                }
-            }
-        }
-       
-        return filas;
-    }
-    
-    class ListenerVisualizarVideo implements ActionListener
-    {
-        private String ruta;
-        private ReproducirVideo rv;
-        
-        public ListenerVisualizarVideo(String ruta)
-        {
-            this.ruta = ruta;
-        }
-        
-        @Override
-        public void actionPerformed(ActionEvent e){
-            rv = new ReproducirVideo(ruta);
-            rv.setVisible(true);
-        }
-    }
-
-    class ListenerEliminarVideo implements ActionListener
-    {
-        private String id;
-        private SistemaCamarasSeguridad scs;
-        private String ruta;
-        private Usuario ventana;
-        
-        public ListenerEliminarVideo(String id, SistemaCamarasSeguridad scs, String ruta, Usuario ventana)
-        {
-            this.id = id;
-            this.scs = scs;
-            this.ruta = ruta;
-            this.ventana = ventana;
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            usuario.deleteVideo(scs, id, ruta);
-            ventana.actualizarPanelVideos();
-        }
-    }
-    */
     
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -843,9 +566,7 @@ public class VAdministardor extends javax.swing.JFrame {
     }//GEN-LAST:event_menuItem_modificarRutaActionPerformed
 
     private void boton_añadirCamaraActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_boton_añadirCamaraActionPerformed
-        //ac.clearEntrada_url();
-        //ac.dispose();
-        //ac.setVisible(true);
+        controlador.insertarCamara();
     }//GEN-LAST:event_boton_añadirCamaraActionPerformed
 
     private void menuItem_modificarContraseñaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItem_modificarContraseñaActionPerformed

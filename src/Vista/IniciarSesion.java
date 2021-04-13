@@ -1,6 +1,10 @@
 package Vista;
 import Controlador.Controlador;
+import java.awt.AWTException;
 import java.awt.Color;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 public class IniciarSesion extends javax.swing.JFrame {
@@ -142,14 +146,22 @@ public class IniciarSesion extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void boton_iniciarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_boton_iniciarActionPerformed
-        if(controlador.iniciarSesionAdministrador(String.valueOf(this.entrada_contraseña.getPassword())))
-        {
-            this.setVisible(false);
-            this.dispose();
-        }
-        else
-        {
-            JOptionPane.showMessageDialog(null, "La contraseña es incorrecta.");
+        try {
+            if(controlador.iniciarSesionAdministrador(String.valueOf(this.entrada_contraseña.getPassword())))
+            {
+                this.setVisible(false);
+                this.dispose();
+            }
+            else
+            {
+                JOptionPane.showMessageDialog(null, "La contraseña es incorrecta.");
+            }
+        } catch (AWTException ex) {
+            Logger.getLogger(IniciarSesion.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(IniciarSesion.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(IniciarSesion.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_boton_iniciarActionPerformed
     
