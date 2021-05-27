@@ -70,7 +70,6 @@ public class Administrador{
         String contraseñaCifrada = archivo.consultarParametro("contraseña");
         String salt = archivo.consultarParametro("salt");
         contraseña += salt;
-        Encriptador encriptador = new Encriptador();
         if(contraseña.equals(encriptador.desencriptar(contraseñaCifrada, contraseña)))
         {
             String email = archivo.consultarParametro("email");
@@ -93,7 +92,6 @@ public class Administrador{
     public boolean insertarCamara(String url) throws ClassNotFoundException, SQLException
     {
         boolean insertado = true;
-        
         Pattern rtsp_patron = Pattern.compile("rtsp://((([a-zA-Z0-9_]+):([a-zA-Z0-9_]+)@)?)(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3}).(\\d{1,3})(.*)");
         Pattern http_patron = Pattern.compile("http://(.*)");
         Pattern https_patron = Pattern.compile("https://(.*)");
@@ -177,10 +175,29 @@ public class Administrador{
     public String getRuta() {
         return ruta;
     }
+    
     public Connection conexion() throws SQLException, ClassNotFoundException
     {
         Class.forName("com.mysql.jdbc.Driver");
         Connection conexion = DriverManager.getConnection("jdbc:mysql://localhost:3306/sgcsr","root","3+UNO=cuatro");
         return conexion;
+    }
+    
+    public boolean modificarCorreo(String correo, String contraseña1, String contraseña2, String contraseñaEnviadaCorreo, String contraseñaEnviadaCorreoCorrecta)
+    {
+        boolean datosCorrectos = false;
+        Pattern patronCorreo = Pattern.compile("([a-zA-Z0-9_\\.]+)@([a-zA-Z0-9_\\.]+)\\.([a-zA-Z0-9_\\.]+)");
+        Matcher matcherCorreo = patronCorreo.matcher(correo);
+        if(contraseña1.equals(contraseña2) && contraseña1.length() > 7 && matcherCorreo.matches() && contraseñaEnviadaCorreoCorrecta.equals(contraseñaEnviadaCorreo))
+        {
+            archivo.guardarParametro("email", encriptador.encriptar(correo, contraseña));
+            archivo.guardarParametro("contraseñaCorreo", encriptador.encriptar(contraseña1, contraseña));
+        }
+        else
+        {
+            JOptionPane.showMessageDialog(null,"El correo y/o la contraseña son icnorrectos.");
+        }
+        
+        return datosCorrectos;
     }
 }

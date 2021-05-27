@@ -22,6 +22,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.mail.MessagingException;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -37,13 +38,6 @@ public class VAdministardor extends javax.swing.JFrame {
     private ImageIcon imageicon;
     private TrayIcon trayicon;
     private SystemTray systemtray;
-    /* private ModificarCorroeTelefono mct = new ModificarCorroeTelefono();
-    private ModifcarRuta mr = new ModifcarRuta();
-    private AñadirCamara ac;
-    private ReproducirVideo rv;
-    private EliminarVideo ev = new EliminarVideo();
-    private ModificarContraseña mc = new ModificarContraseña();
-    private MostrarAplicacion ma = new MostrarAplicacion(this);*/
     
     public VAdministardor(Controlador controlador) throws AWTException, SQLException, InterruptedException {
         initComponents();
@@ -72,10 +66,8 @@ public class VAdministardor extends javax.swing.JFrame {
         //JtPaneles
         actualizarPanelCamaras();
         subapartados.setFocusable(false);
-        //actualizarPanelVideos();
-        
+        //actualizarPanelVideos();   
     }
-    
     
     private void minimizarIcono()
     {
@@ -83,7 +75,6 @@ public class VAdministardor extends javax.swing.JFrame {
         trayicon.setImageAutoSize(true);
         this.systemtray = SystemTray.getSystemTray();
     }
-    
     
     public void actualizarPanelCamaras() throws SQLException, InterruptedException
     {
@@ -109,7 +100,6 @@ public class VAdministardor extends javax.swing.JFrame {
     
     public ArrayList<JPanel> rellenarFilasCamaras() throws SQLException, InterruptedException
     {
-       
         ArrayList<JPanel> filas = new ArrayList<JPanel>();
         ArrayList<Camara> camaras = this.controlador.getCamaras();
         JPanel panel_fila;
@@ -225,6 +215,8 @@ public class VAdministardor extends javax.swing.JFrame {
         entrada_fechFinal_mesç = new javax.swing.JTextField();
         entrada_fechFinall_año = new javax.swing.JTextField();
         boton_realizar_busqueda = new javax.swing.JButton();
+        jPanel1 = new javax.swing.JPanel();
+        jPanel2 = new javax.swing.JPanel();
         menu = new javax.swing.JMenuBar();
         menu_ajustes = new javax.swing.JMenu();
         menuItem_correoTelefono = new javax.swing.JMenuItem();
@@ -443,6 +435,32 @@ public class VAdministardor extends javax.swing.JFrame {
 
         subapartados.addTab("Vídeos", panel_principal_videos);
 
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 787, Short.MAX_VALUE)
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 678, Short.MAX_VALUE)
+        );
+
+        subapartados.addTab("Usuarios", jPanel1);
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 787, Short.MAX_VALUE)
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 678, Short.MAX_VALUE)
+        );
+
+        subapartados.addTab("Registro", jPanel2);
+
         javax.swing.GroupLayout panel_fondoLayout = new javax.swing.GroupLayout(panel_fondo);
         panel_fondo.setLayout(panel_fondoLayout);
         panel_fondoLayout.setHorizontalGroup(
@@ -541,7 +559,7 @@ public class VAdministardor extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void popup_MostrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_popup_MostrarActionPerformed
-        //this.ma.setVisible(true);
+        this.setVisible(true);
     }//GEN-LAST:event_popup_MostrarActionPerformed
 
     private void popup_SalirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_popup_SalirActionPerformed
@@ -557,8 +575,11 @@ public class VAdministardor extends javax.swing.JFrame {
     }//GEN-LAST:event_menuItem_salirActionPerformed
 
     private void menuItem_correoTelefonoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItem_correoTelefonoActionPerformed
-        //mct.dispose();
-        //mct.setVisible(true);
+        try {
+            controlador.moodificarCorreoVisible();
+        } catch (MessagingException ex) {
+            Logger.getLogger(VAdministardor.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_menuItem_correoTelefonoActionPerformed
 
     private void menuItem_modificarRutaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItem_modificarRutaActionPerformed
@@ -587,6 +608,8 @@ public class VAdministardor extends javax.swing.JFrame {
     private javax.swing.JTextField entrada_fechInicial_año;
     private javax.swing.JTextField entrada_fechInicial_dia;
     private javax.swing.JTextField entrada_fechInicial_mes;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
     private javax.swing.JProgressBar jProgressBar1;
     private javax.swing.JMenuBar menu;
     private javax.swing.JMenuItem menuItem_correoTelefono;

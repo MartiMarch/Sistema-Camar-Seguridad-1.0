@@ -11,8 +11,10 @@ public class RegistroUnico extends javax.swing.JFrame {
     private String correo;
     private String correoContraseña;
     private Controlador controlador;
+    private boolean registrado;
     
     public RegistroUnico(Controlador controlador) {
+        registrado = false;
         initComponents();
         this.controlador = controlador;
         
@@ -28,6 +30,11 @@ public class RegistroUnico extends javax.swing.JFrame {
         
         //CheckBox
         this.checkbox_clausula.setFocusPainted(false);
+    }
+
+    public boolean isRegistrado()
+    {
+        return registrado;
     }
 
     @SuppressWarnings("unchecked")
@@ -273,6 +280,7 @@ public class RegistroUnico extends javax.swing.JFrame {
                 correo = entrada_correo.getText();
                 correoContraseña = String.valueOf(entrada_contraseñaCorreo.getPassword());
                 controlador.registrarAdministrador(contraseña, correo, correoContraseña);
+                registrado = true;
                 this.setVisible(false);
                 this.dispose();
             }
