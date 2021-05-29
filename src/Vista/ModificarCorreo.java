@@ -7,6 +7,7 @@ import javax.swing.WindowConstants;
 public class ModificarCorreo extends javax.swing.JFrame {
 
     private Controlador controlador;
+    private String secreto = "";
     
     public ModificarCorreo() {
         initComponents();
@@ -64,6 +65,7 @@ public class ModificarCorreo extends javax.swing.JFrame {
         textoNumeroCorreo = new javax.swing.JLabel();
         entradaNumeroCorreo = new javax.swing.JTextField();
         separador4 = new javax.swing.JSeparator();
+        jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -86,7 +88,7 @@ public class ModificarCorreo extends javax.swing.JFrame {
 
         textoContraseña.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         textoContraseña.setForeground(new java.awt.Color(255, 255, 255));
-        textoContraseña.setText("Contraseña:");
+        textoContraseña.setText("Contraseña");
 
         separador3.setBackground(new java.awt.Color(83, 83, 83));
         separador3.setForeground(new java.awt.Color(83, 83, 83));
@@ -124,6 +126,10 @@ public class ModificarCorreo extends javax.swing.JFrame {
         separador4.setBackground(new java.awt.Color(83, 83, 83));
         separador4.setForeground(new java.awt.Color(83, 83, 83));
 
+        jLabel1.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel1.setText("del correo:");
+
         javax.swing.GroupLayout panelPrinciaplLayout = new javax.swing.GroupLayout(panelPrinciapl);
         panelPrinciapl.setLayout(panelPrinciaplLayout);
         panelPrinciaplLayout.setHorizontalGroup(
@@ -133,7 +139,10 @@ public class ModificarCorreo extends javax.swing.JFrame {
                     .addGroup(panelPrinciaplLayout.createSequentialGroup()
                         .addGap(14, 14, 14)
                         .addGroup(panelPrinciaplLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(entradaContraseña_2, javax.swing.GroupLayout.PREFERRED_SIZE, 242, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(panelPrinciaplLayout.createSequentialGroup()
+                                .addComponent(jLabel1)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(entradaContraseña_2, javax.swing.GroupLayout.PREFERRED_SIZE, 242, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(javax.swing.GroupLayout.Alignment.LEADING, panelPrinciaplLayout.createSequentialGroup()
                                 .addComponent(textoNumeroCorreo)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -171,7 +180,9 @@ public class ModificarCorreo extends javax.swing.JFrame {
                     .addComponent(textoContraseña)
                     .addComponent(entradaContraseña_1, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(9, 9, 9)
-                .addComponent(entradaContraseña_2, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(panelPrinciaplLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(entradaContraseña_2, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel1))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(separador3, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -208,15 +219,9 @@ public class ModificarCorreo extends javax.swing.JFrame {
     private void boton_guardarCambiosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_boton_guardarCambiosActionPerformed
         if(controlador.modificarCorreo(entradaCorreo.getText(), entradaContraseña_1.getPassword().toString(), entradaContraseña_2.getPassword().toString(), entradaNumeroCorreo.getText()))
         {
-            
+            this.setVisible(false);
         }
     }//GEN-LAST:event_boton_guardarCambiosActionPerformed
-
-    public static void main(String args[]) {
-        java.awt.EventQueue.invokeLater(() -> {
-            new ModificarCorreo().setVisible(true);
-        });
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton boton_guardarCambios;
@@ -224,6 +229,7 @@ public class ModificarCorreo extends javax.swing.JFrame {
     private javax.swing.JPasswordField entradaContraseña_2;
     private javax.swing.JTextField entradaCorreo;
     private javax.swing.JTextField entradaNumeroCorreo;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel panelPrinciapl;
     private javax.swing.JSeparator separador1;
     private javax.swing.JSeparator separador2;

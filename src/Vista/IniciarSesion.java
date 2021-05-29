@@ -162,6 +162,8 @@ public class IniciarSesion extends javax.swing.JFrame {
             Logger.getLogger(IniciarSesion.class.getName()).log(Level.SEVERE, null, ex);
         } catch (InterruptedException ex) {
             Logger.getLogger(IniciarSesion.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(IniciarSesion.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_boton_iniciarActionPerformed
     

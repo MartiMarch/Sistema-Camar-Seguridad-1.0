@@ -200,4 +200,51 @@ public class Administrador{
         
         return datosCorrectos;
     }
+    
+    public boolean modificarContaseña(String contraseña1, String contraseña2, String contraseñaEnviadaCorreoCorrecta, String contraseñaEnviadaCorreo)
+    {
+        boolean datosCorrectos = false;
+        if(contraseña1.equals(contraseña2) && contraseña1.length() > 7 && contraseñaEnviadaCorreoCorrecta.equals(contraseñaEnviadaCorreo))
+        {
+            datosCorrectos = true;
+            
+            ArrayList<String> hash = encriptador.generarHash(contraseña1);
+            contraseña = contraseña1 + hash.get(1);
+            archivo.guardarParametro("contraseña", hash.get(0));
+            archivo.guardarParametro("salt", hash.get(1));
+            archivo.guardarParametro("email", encriptador.encriptar(this.email, contraseña));
+            archivo.guardarParametro("contraseñaCorreo", encriptador.encriptar(this.contraseñaCorreo, contraseña));
+        }
+        else
+        {
+            JOptionPane.showMessageDialog(null,"El formato y/o el número del correo son incorrectos.");
+        }
+        return datosCorrectos;
+    }
+    
+    public boolean añadirUsuario(String nombre, String correo, String contraseña1, String contraseña2) throws SQLException, ClassNotFoundException
+    {
+        boolean datosCorrectos = false;
+        Pattern patronCorreo = Pattern.compile("([a-zA-Z0-9_\\.]+)@([a-zA-Z0-9_\\.]+)\\.([a-zA-Z0-9_\\.]+)");
+        Matcher matcherCorreo = patronCorreo.matcher(correo);
+        if(contraseña1.equals(contraseña2) && contraseña1.length() > 7 && matcherCorreo.matches())
+        {
+            datosCorrectos = true;
+            
+            ArrayList<String> hash = encriptador.generarHash(contraseña1);
+            nombre = encriptador.encriptar(nombre, contraseña);
+            correo = encriptador.encriptar(correo, contraseña);
+            
+            Statement st = conexion().createStatement();
+            String insertarCliente = "INSERT INTO clientes VALUES ('" + nombre + "', '" + hash.get(0) + "', '" + hash.get(1) + "', '" + correo + "');";
+            st.executeUpdate(insertarCliente);
+            st.close();
+        }
+        else
+        {
+            JOptionPane.showMessageDialog(null,"El correo y/o la contraseña son icnorrectos.");
+        }
+        
+        return datosCorrectos;
+    }
 }

@@ -7,6 +7,7 @@ import ComponentesBasicos.JBSeparator;
 import ComponentesBasicos.JBTextField;
 import Controlador.Controlador;
 import Modelo.Camara;
+import Modelo.Cliente;
 import java.awt.AWTException;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -39,7 +40,7 @@ public class VAdministardor extends javax.swing.JFrame {
     private TrayIcon trayicon;
     private SystemTray systemtray;
     
-    public VAdministardor(Controlador controlador) throws AWTException, SQLException, InterruptedException {
+    public VAdministardor(Controlador controlador) throws AWTException, SQLException, InterruptedException, ClassNotFoundException {
         initComponents();
     
         //informacion memoria
@@ -59,14 +60,14 @@ public class VAdministardor extends javax.swing.JFrame {
         }
         
         //Botones
-        this.boton_añadirCamara.setFocusable(false);
         this.boton_añadirCamara.setFocusable(false);  
+        this.boton_realizar_busqueda.setFocusable(false);
+        this.botonAñadirUsuario.setFocusable(false);
         
-        
-        //JtPaneles
-        actualizarPanelCamaras();
+        //JPaneles
         subapartados.setFocusable(false);
-        //actualizarPanelVideos();   
+        actualizarPanelCamaras();
+        actualizarPanelClientes();
     }
     
     private void minimizarIcono()
@@ -76,7 +77,7 @@ public class VAdministardor extends javax.swing.JFrame {
         this.systemtray = SystemTray.getSystemTray();
     }
     
-    public void actualizarPanelCamaras() throws SQLException, InterruptedException
+    public void actualizarPanelCamaras() throws SQLException, InterruptedException, ClassNotFoundException
     {
         ArrayList<JPanel> filas = rellenarFilasCamaras();
         JPanel panel = new JPanel();
@@ -98,7 +99,7 @@ public class VAdministardor extends javax.swing.JFrame {
         panel_lista_camaras.add(scrollPane);
     }
     
-    public ArrayList<JPanel> rellenarFilasCamaras() throws SQLException, InterruptedException
+    public ArrayList<JPanel> rellenarFilasCamaras() throws SQLException, InterruptedException, ClassNotFoundException
     {
         ArrayList<JPanel> filas = new ArrayList<JPanel>();
         ArrayList<Camara> camaras = this.controlador.getCamaras();
@@ -191,6 +192,69 @@ public class VAdministardor extends javax.swing.JFrame {
         }  
     }
     
+    public void actualizarPanelClientes() throws SQLException, ClassNotFoundException
+    {
+        ArrayList<JPanel> filas = rellenarFilasClientes();
+        JPanel panel = new JPanel();
+        panel.setBackground(new Color(127,127,127));
+        panel.setLayout(new BoxLayout( panel, BoxLayout.Y_AXIS));
+        for(int i = 0; i < filas.size(); ++i)
+        {
+            filas.get(i).setMaximumSize(filas.get(i).getPreferredSize());
+            filas.get(i).setAlignmentX(LEFT_ALIGNMENT);
+            panel.add(filas.get(i));
+        }
+        panel.revalidate();
+        panel.repaint();
+        JBScrollPane scrollPane = new JBScrollPane(panel);
+        panel_lista_clientes.removeAll();
+        panel_lista_clientes.revalidate();
+        panel_lista_clientes.repaint();
+        panel_lista_clientes.setLayout(new BorderLayout());
+        panel_lista_clientes.add(scrollPane);
+    }
+    
+    public ArrayList<JPanel> rellenarFilasClientes() throws SQLException, ClassNotFoundException
+    {
+        ArrayList<JPanel> filas = new ArrayList();
+        ArrayList<Cliente> clientes = controlador.getClientes();
+        JPanel panelFila;
+        
+        for(int i = 0; i < clientes.size(); ++i)
+        {
+            
+            panelFila = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 15));
+            panelFila.setBackground(new Color(127, 127, 127));
+            
+            //Nombre del cliente
+            panelFila.add(Box.createRigidArea(new Dimension(40, 0)));
+            JBTextField nombreCliente = new JBTextField(clientes.get(i).getNombre());
+            panelFila.add(nombreCliente);
+            
+            //Correo del cliente
+            panelFila.add(Box.createRigidArea(new Dimension(40, 0)));
+            JBTextField correoCliente = new JBTextField(clientes.get(i).getCorreo());
+            panelFila.add(correoCliente);
+            
+            //Boton eliminar usuario
+            panelFila.add(Box.createRigidArea(new Dimension(40, 0)));
+            JBIconButton eliminar = new JBIconButton(new ImageIcon(System.getProperty("user.dir") + "\\src\\Imagenes\\boton_eliminar.png"));
+            panelFila.add(eliminar);
+            
+            filas.add(panelFila);
+            
+            //Separador
+            panelFila = new JPanel();
+            JBSeparator s = new JBSeparator();
+            panelFila.setBackground(new Color(127,127,127));
+            panelFila.add(s);
+            
+            filas.add(panelFila);
+        }
+        
+        return filas;
+    }
+    
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -216,6 +280,9 @@ public class VAdministardor extends javax.swing.JFrame {
         entrada_fechFinall_año = new javax.swing.JTextField();
         boton_realizar_busqueda = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
+        panel_principal_usuarios = new javax.swing.JPanel();
+        panel_lista_clientes = new javax.swing.JPanel();
+        botonAñadirUsuario = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         menu = new javax.swing.JMenuBar();
         menu_ajustes = new javax.swing.JMenu();
@@ -295,22 +362,22 @@ public class VAdministardor extends javax.swing.JFrame {
         panel_principal_camarasLayout.setHorizontalGroup(
             panel_principal_camarasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panel_principal_camarasLayout.createSequentialGroup()
-                .addGap(21, 21, 21)
-                .addComponent(boton_añadirCamara, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(631, Short.MAX_VALUE))
-            .addGroup(panel_principal_camarasLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(panel_lista_camaras, javax.swing.GroupLayout.DEFAULT_SIZE, 775, Short.MAX_VALUE)
                 .addContainerGap())
+            .addGroup(panel_principal_camarasLayout.createSequentialGroup()
+                .addGap(26, 26, 26)
+                .addComponent(boton_añadirCamara, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         panel_principal_camarasLayout.setVerticalGroup(
             panel_principal_camarasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panel_principal_camarasLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(panel_lista_camaras, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(41, 41, 41)
+                .addGap(45, 45, 45)
                 .addComponent(boton_añadirCamara, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(50, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         subapartados.addTab("Cámaras", panel_principal_camaras);
@@ -329,7 +396,7 @@ public class VAdministardor extends javax.swing.JFrame {
         panel_lista_videos.setLayout(panel_lista_videosLayout);
         panel_lista_videosLayout.setHorizontalGroup(
             panel_lista_videosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 771, Short.MAX_VALUE)
+            .addGap(0, 0, Short.MAX_VALUE)
         );
         panel_lista_videosLayout.setVerticalGroup(
             panel_lista_videosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -405,7 +472,7 @@ public class VAdministardor extends javax.swing.JFrame {
                         .addGap(93, 93, 93)
                         .addComponent(boton_realizar_busqueda, javax.swing.GroupLayout.PREFERRED_SIZE, 136, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(texto_fechaFinal))
-                .addContainerGap(177, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(panel_principal_videosLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(panel_lista_videos, javax.swing.GroupLayout.DEFAULT_SIZE, 775, Short.MAX_VALUE)
@@ -430,33 +497,87 @@ public class VAdministardor extends javax.swing.JFrame {
                         .addComponent(entrada_fechFinal_mesç, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(entrada_fechFinall_año, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(boton_realizar_busqueda, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(45, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         subapartados.addTab("Vídeos", panel_principal_videos);
+
+        panel_principal_usuarios.setBackground(new java.awt.Color(127, 127, 127));
+        panel_principal_usuarios.setForeground(new java.awt.Color(255, 255, 255));
+        panel_principal_usuarios.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+
+        panel_lista_clientes.setBackground(new java.awt.Color(127, 127, 127));
+        panel_lista_clientes.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(83, 83, 83), 2, true));
+        panel_lista_clientes.setAutoscrolls(true);
+        panel_lista_clientes.setPreferredSize(new java.awt.Dimension(764, 550));
+
+        javax.swing.GroupLayout panel_lista_clientesLayout = new javax.swing.GroupLayout(panel_lista_clientes);
+        panel_lista_clientes.setLayout(panel_lista_clientesLayout);
+        panel_lista_clientesLayout.setHorizontalGroup(
+            panel_lista_clientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+        panel_lista_clientesLayout.setVerticalGroup(
+            panel_lista_clientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 546, Short.MAX_VALUE)
+        );
+
+        botonAñadirUsuario.setBackground(new java.awt.Color(83, 83, 83));
+        botonAñadirUsuario.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        botonAñadirUsuario.setForeground(new java.awt.Color(255, 255, 255));
+        botonAñadirUsuario.setText("Añadir usuario");
+        botonAñadirUsuario.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED, new java.awt.Color(127, 127, 127), new java.awt.Color(127, 127, 127), new java.awt.Color(127, 127, 127), new java.awt.Color(127, 127, 127)));
+        botonAñadirUsuario.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                botonAñadirUsuarioActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout panel_principal_usuariosLayout = new javax.swing.GroupLayout(panel_principal_usuarios);
+        panel_principal_usuarios.setLayout(panel_principal_usuariosLayout);
+        panel_principal_usuariosLayout.setHorizontalGroup(
+            panel_principal_usuariosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panel_principal_usuariosLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(panel_lista_clientes, javax.swing.GroupLayout.DEFAULT_SIZE, 775, Short.MAX_VALUE)
+                .addContainerGap())
+            .addGroup(panel_principal_usuariosLayout.createSequentialGroup()
+                .addGap(26, 26, 26)
+                .addComponent(botonAñadirUsuario, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        panel_principal_usuariosLayout.setVerticalGroup(
+            panel_principal_usuariosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panel_principal_usuariosLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(panel_lista_clientes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(45, 45, 45)
+                .addComponent(botonAñadirUsuario, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(46, Short.MAX_VALUE))
+        );
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 787, Short.MAX_VALUE)
+            .addComponent(panel_principal_usuarios, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 678, Short.MAX_VALUE)
+            .addComponent(panel_principal_usuarios, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
-        subapartados.addTab("Usuarios", jPanel1);
+        subapartados.addTab("Clientes", jPanel1);
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 787, Short.MAX_VALUE)
+            .addGap(0, 0, Short.MAX_VALUE)
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 678, Short.MAX_VALUE)
+            .addGap(0, 0, Short.MAX_VALUE)
         );
 
         subapartados.addTab("Registro", jPanel2);
@@ -591,15 +712,23 @@ public class VAdministardor extends javax.swing.JFrame {
     }//GEN-LAST:event_boton_añadirCamaraActionPerformed
 
     private void menuItem_modificarContraseñaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItem_modificarContraseñaActionPerformed
-        //mc.dispose();
-        //mc.setVisible(true);
+        try {
+            controlador.modificarContraseñaVisible();
+        } catch (MessagingException ex) {
+            Logger.getLogger(VAdministardor.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_menuItem_modificarContraseñaActionPerformed
 
     private void popupActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_popupActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_popupActionPerformed
 
+    private void botonAñadirUsuarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonAñadirUsuarioActionPerformed
+        controlador.añadirUsuarioVisible();
+    }//GEN-LAST:event_botonAñadirUsuarioActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton botonAñadirUsuario;
     private javax.swing.JButton boton_añadirCamara;
     private javax.swing.JButton boton_realizar_busqueda;
     private javax.swing.JTextField entrada_fechFinal_dia;
@@ -620,8 +749,10 @@ public class VAdministardor extends javax.swing.JFrame {
     private javax.swing.JMenu menu_ajustes;
     private javax.swing.JPanel panel_fondo;
     private javax.swing.JPanel panel_lista_camaras;
+    private javax.swing.JPanel panel_lista_clientes;
     private javax.swing.JPanel panel_lista_videos;
     private javax.swing.JPanel panel_principal_camaras;
+    private javax.swing.JPanel panel_principal_usuarios;
     private javax.swing.JPanel panel_principal_videos;
     private java.awt.PopupMenu popup;
     private java.awt.MenuItem popup_Mostrar;

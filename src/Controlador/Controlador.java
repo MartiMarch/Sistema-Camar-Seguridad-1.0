@@ -5,8 +5,11 @@ import ClasesAuxiliares.Correo;
 import ClasesAuxiliares.Encriptador;
 import Modelo.Administrador;
 import Modelo.Camara;
+import Modelo.Cliente;
 import Vista.AñadirCamara;
+import Vista.AñadirUsuario;
 import Vista.IniciarSesion;
+import Vista.ModificarContraseña;
 import Vista.ModificarCorreo;
 import Vista.RegistroUnico;
 import Vista.VAdministardor;
@@ -30,6 +33,8 @@ public class Controlador {
     private Encriptador encriptador = new Encriptador();
     private VAdministardor v_administrador;
     private ModificarCorreo modificarCorreo = new ModificarCorreo();
+    private ModificarContraseña modificarContraseña = new ModificarContraseña();
+    private AñadirUsuario añadirUsuario = new AñadirUsuario();
     private Correo correo = new Correo();
     private String numeroSecretoCorreo = "";
     
@@ -142,7 +147,7 @@ public class Controlador {
         administrador = administrador.registrarAdministrador(contraseña, correo, contraseñaCorreo);
     }
     
-    public boolean iniciarSesionAdministrador(String contraseña) throws AWTException, SQLException, InterruptedException
+    public boolean iniciarSesionAdministrador(String contraseña) throws AWTException, SQLException, InterruptedException, ClassNotFoundException
     {
         boolean identificacion = false;
         if(administrador.iniciarSesionAdministrador(contraseña))
@@ -155,30 +160,40 @@ public class Controlador {
         return identificacion;
     }
     
-    public ArrayList<Camara> getCamaras()
+    public ArrayList<Camara> getCamaras() throws SQLException, ClassNotFoundException
     {
-        ArrayList<Camara> camaras = null;
-        try {
-            camaras = new ArrayList<>();
-            Statement st = conexion().createStatement();
-            String obtenerCamaras = "SELECT * FROM camaras";
-            ResultSet rs = st.executeQuery(obtenerCamaras);
-            while(rs.next())
-            {
-                String url = rs.getString("url");
-                url = encriptador.desencriptar(url, administrador.getContraseña());
-                Camara camara = new Camara(url);
-                camaras.add(camara);
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(Controlador.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(Controlador.class.getName()).log(Level.SEVERE, null, ex);
+        ArrayList<Camara> camaras = new ArrayList<>();
+        Statement st = conexion().createStatement();
+        String obtenerCamaras = "SELECT * FROM camaras";
+        ResultSet rs = st.executeQuery(obtenerCamaras);
+        while(rs.next())
+        {
+            String url = rs.getString("url");
+            url = encriptador.desencriptar(url, administrador.getContraseña());
+            Camara camara = new Camara(url);
+            camaras.add(camara);
         }
         
         return camaras;
     }
 
+    public ArrayList<Cliente> getClientes() throws SQLException, ClassNotFoundException
+    {
+        ArrayList<Cliente> clientes = new ArrayList();
+        Statement st = conexion().createStatement();
+        String obtenerClientes = "SELECT * FROM clientes";
+        ResultSet rs = st.executeQuery(obtenerClientes);
+        while(rs.next())
+        {
+            String nombre = encriptador.desencriptar(rs.getString("nombre"), administrador.getContraseña());
+            String email = encriptador.desencriptar(rs.getString("email"), administrador.getContraseña());
+            Cliente cliente = new Cliente(nombre, email);
+            clientes.add(cliente);
+        }
+        
+        return clientes;
+    }
+    
     public Encriptador getEncriptador() 
     {
         return encriptador;
@@ -221,10 +236,51 @@ public class Controlador {
     public void moodificarCorreoVisible() throws MessagingException
     {
         modificarCorreo.setControlador(this);
+        modificarCorreo.setEntradaNumeroCorreo("");
         modificarCorreo.setEntradaContraseña_1("");
         modificarCorreo.setEntradaContraseña_2("");
         modificarCorreo.setEntradaCorreo("");
-        modificarCorreo.setEntradaNumeroCorreo("");
+        enviarSecretoCorreo();
+        modificarCorreo.setVisible(true);
+    }
+    
+    public boolean modificarCorreo(String correo, String contraseña1, String contraseña2, String contraseñaEnviadaCorreo)
+    {
+        return administrador.modificarCorreo(correo, contraseña1, contraseña2, contraseñaEnviadaCorreo, numeroSecretoCorreo);
+    }
+    
+    public void modificarContraseñaVisible() throws MessagingException
+    {
+        modificarContraseña.setControlador(this);
+        modificarContraseña.setEntradNumeroCorreo("");
+        modificarContraseña.setEntradaContraseña1("");
+        modificarContraseña.setEntradaContraseña2("");
+        enviarSecretoCorreo();
+        modificarContraseña.setVisible(true);
+    }
+    
+    public boolean modificarContraseña(String contraseña1, String contraseña2, String numeroCorreo)
+    {
+        return administrador.modificarContaseña(contraseña1, contraseña2, numeroCorreo, numeroSecretoCorreo);
+    }
+    
+    public void añadirUsuarioVisible()
+    {
+        añadirUsuario.setControlador(this);
+        añadirUsuario.setEntradaCorreo("");
+        añadirUsuario.setEntradaNombre("");
+        añadirUsuario.setEtradaContraseña1("");
+        añadirUsuario.setEtradaContraseña2("");
+        añadirUsuario.setVisible(true);
+    }
+    
+    public boolean añadirUsuario(String nombre, String correo, String contraseña1, String contraseña2) throws SQLException, ClassNotFoundException
+    {
+        return administrador.añadirUsuario(nombre, correo, contraseña1, contraseña2);
+    }
+    
+    public void enviarSecretoCorreo() throws MessagingException
+    {
         List<Integer> digitos = new ArrayList<>();
         for(int i = 0; i < 10; i++)
         {
@@ -241,11 +297,5 @@ public class Controlador {
             "El nuevo número de seguridad que has de introducir es el siguiente: " + numeroSecretoCorreo + "\n"
         );
         JOptionPane.showMessageDialog(null, "Revisa tu correo para obtener el número de seguridad.");
-        modificarCorreo.setVisible(true);
-    }
-    
-    public boolean modificarCorreo(String correo, String contraseña1, String contraseña2, String contraseñaEnviadaCorreo)
-    {
-        return administrador.modificarCorreo(correo, contraseña1, contraseña2, contraseñaEnviadaCorreo, numeroSecretoCorreo);
     }
 }
