@@ -241,7 +241,7 @@ public class AñadirUsuario extends javax.swing.JFrame {
 
     private void botonAñadirUsuarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonAñadirUsuarioActionPerformed
         try {
-            if(controlador.añadirUsuario(entradaNombre.getText(), entradaCorreo.getText(), new String(entradaContraseña1.getPassword()), new String(entradaContraseña2.getPassword())))
+            if(controlador.añadirCliente(entradaNombre.getText(), entradaCorreo.getText(), new String(entradaContraseña1.getPassword()), new String(entradaContraseña2.getPassword())))
             {
                 this.setVisible(false);
             }

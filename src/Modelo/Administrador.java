@@ -2,13 +2,19 @@ package Modelo;
 
 import ClasesAuxiliares.ArchivoConfiguracion;
 import ClasesAuxiliares.Encriptador;
+import Vista.ReproducirVideo;
 import Vista.VisualizarCamara;
+import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
@@ -89,7 +95,7 @@ public class Administrador{
         return identificado;
     }
     
-    public boolean insertarCamara(String url) throws ClassNotFoundException, SQLException
+    public boolean insertarCamara(String url, Movimiento movimiento) throws ClassNotFoundException, SQLException, InterruptedException
     {
         boolean insertado = true;
         Pattern rtsp_patron = Pattern.compile("rtsp://((([a-zA-Z0-9_]+):([a-zA-Z0-9_]+)@)?)(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3}).(\\d{1,3})(.*)");
@@ -133,6 +139,7 @@ public class Administrador{
                 url = encriptador.encriptar(url, contraseña);
                 String insertarCamara = "INSERT INTO camaras VALUES ('" + url + "')";
                 st.executeUpdate(insertarCamara);
+                movimiento.addCamra(url);
             }
             else
             {
@@ -145,13 +152,16 @@ public class Administrador{
         return insertado;
     }
     
-    public void eliminarCamara(String url) throws SQLException, ClassNotFoundException
+    public void eliminarCamara(String url, Movimiento movimiento) throws SQLException, ClassNotFoundException, InterruptedException
     {
         url = encriptador.encriptar(url, contraseña);
         Statement st = conexion().createStatement();
         String eliminarCamara = "DELETE FROM camaras WHERE url = '" + url + "'";
         st.executeUpdate(eliminarCamara);
+        String eliminarAsociaciones = "DELETE FROM camarasclientes WHERE urlCamara = '" + url + "'";
+        st.executeUpdate(eliminarAsociaciones);
         st.close();
+        movimiento.finalizarHilos(url);
     }
     
     public void visualizarCamara(String url) throws InterruptedException
@@ -160,19 +170,23 @@ public class Administrador{
         vc.setVisible(true);
     }
 
-    public String getContraseña() {
+    public String getContraseña()
+    {
         return contraseña;
     }
 
-    public String getEmail() {
+    public String getEmail()
+    {
         return email;
     }
 
-    public String getContraseñaCorreo() {
+    public String getContraseñaCorreo()
+    {
         return contraseñaCorreo;
     }
 
-    public String getRuta() {
+    public String getRuta()
+    {
         return ruta;
     }
     
@@ -180,6 +194,7 @@ public class Administrador{
     {
         Class.forName("com.mysql.jdbc.Driver");
         Connection conexion = DriverManager.getConnection("jdbc:mysql://localhost:3306/sgcsr","root","3+UNO=cuatro");
+        
         return conexion;
     }
     
@@ -219,10 +234,11 @@ public class Administrador{
         {
             JOptionPane.showMessageDialog(null,"El formato y/o el número del correo son incorrectos.");
         }
+        
         return datosCorrectos;
     }
     
-    public boolean añadirUsuario(String nombre, String correo, String contraseña1, String contraseña2) throws SQLException, ClassNotFoundException
+    public boolean añadirCliente(String nombre, String correo, String contraseña1, String contraseña2) throws SQLException, ClassNotFoundException
     {
         boolean datosCorrectos = false;
         Pattern patronCorreo = Pattern.compile("([a-zA-Z0-9_\\.]+)@([a-zA-Z0-9_\\.]+)\\.([a-zA-Z0-9_\\.]+)");
@@ -244,7 +260,48 @@ public class Administrador{
         {
             JOptionPane.showMessageDialog(null,"El correo y/o la contraseña son icnorrectos.");
         }
-        
+
         return datosCorrectos;
+    }
+    
+    public void eliminarCliente(String nombre) throws SQLException, ClassNotFoundException
+    {
+        nombre = encriptador.encriptar(nombre, contraseña);
+        Statement st = conexion().createStatement();
+        String eliminarCamara = "DELETE FROM clientes WHERE nombre = '" + nombre + "'";
+        st.executeUpdate(eliminarCamara);
+        st.close();
+    }
+    
+    public void eliminarVideo(Video video) throws SQLException, ClassNotFoundException, ParseException
+    {
+        String fechaVideo = video.getId();
+        fechaVideo = fechaVideo.replaceAll("-", "/");
+        fechaVideo = fechaVideo.replaceAll("_", ":");
+        SimpleDateFormat fechaF = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        Date d = null;
+        d = fechaF.parse(fechaVideo);
+        ZonedDateTime now = ZonedDateTime.now();
+        ZonedDateTime mes = now.plusDays(-30);
+        if(d.toInstant().isBefore(mes.toInstant()))
+        {
+            Statement st = conexion().createStatement();
+            String eliminarVideo = "DELETE FROM videos WHERE id = '" + video.getId() + "'";
+            st.executeUpdate(eliminarVideo);
+            st.close();
+            File archivo = new File("C:\\SGCSR\\" + video.getId() + ".mp4");
+            archivo.delete();
+        }
+        else
+        {
+            JOptionPane.showMessageDialog(null,"No se puede borrar el vídeo ya que no tiene un antigüedad superior a un mes.");
+        }
+    }
+    
+    public void visualizarVideo(String id) throws InterruptedException
+    {
+        String ruta = "C:\\SGCSR\\" + id + ".mp4";
+        ReproducirVideo rv = new ReproducirVideo(ruta);
+        rv.setVisible(true);
     }
 }

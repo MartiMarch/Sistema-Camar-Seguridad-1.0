@@ -8,6 +8,8 @@ import ComponentesBasicos.JBTextField;
 import Controlador.Controlador;
 import Modelo.Camara;
 import Modelo.Cliente;
+import Modelo.Video;
+import com.mysql.jdbc.Statement;
 import java.awt.AWTException;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -18,6 +20,7 @@ import java.awt.TrayIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -68,6 +71,7 @@ public class VAdministardor extends javax.swing.JFrame {
         subapartados.setFocusable(false);
         actualizarPanelCamaras();
         actualizarPanelClientes();
+        actualizarPanelVideos();
     }
     
     private void minimizarIcono()
@@ -239,6 +243,7 @@ public class VAdministardor extends javax.swing.JFrame {
             //Boton eliminar usuario
             panelFila.add(Box.createRigidArea(new Dimension(40, 0)));
             JBIconButton eliminar = new JBIconButton(new ImageIcon(System.getProperty("user.dir") + "\\src\\Imagenes\\boton_eliminar.png"));
+            eliminar.addActionListener(new ListenerEliminarCliente(clientes.get(i).getNombre()));
             panelFila.add(eliminar);
             
             filas.add(panelFila);
@@ -253,6 +258,137 @@ public class VAdministardor extends javax.swing.JFrame {
         }
         
         return filas;
+    }
+    
+    class ListenerEliminarCliente implements ActionListener
+    {
+        private String nombre;
+        
+        public ListenerEliminarCliente(String nombre)
+        {
+            this.nombre = nombre;
+        }
+        
+        @Override
+        public void actionPerformed(ActionEvent e)
+        {
+            try {
+                controlador.eliminarCliente(nombre);
+            } catch (SQLException ex) {
+                Logger.getLogger(VAdministardor.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (ClassNotFoundException ex) {
+                Logger.getLogger(VAdministardor.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+    
+    public void actualizarPanelVideos() throws SQLException, InterruptedException, ClassNotFoundException
+    {
+        ArrayList<JPanel> filas = rellenarFilasVideos();
+        JPanel panel = new JPanel();
+        panel.setBackground(new Color(127,127,127));
+        panel.setLayout(new BoxLayout( panel, BoxLayout.Y_AXIS));
+        for(int i = 0; i < filas.size(); ++i)
+        {
+            filas.get(i).setMaximumSize(filas.get(i).getPreferredSize());
+            filas.get(i).setAlignmentX(LEFT_ALIGNMENT);
+            panel.add(filas.get(i));
+        }
+        panel.revalidate();
+        panel.repaint();
+        JBScrollPane scrollPane = new JBScrollPane(panel);
+        panel_lista_videos.removeAll();
+        panel_lista_videos.revalidate();
+        panel_lista_videos.repaint();
+        panel_lista_videos.setLayout(new BorderLayout());
+        panel_lista_videos.add(scrollPane);
+    }
+    
+    public ArrayList<JPanel> rellenarFilasVideos() throws SQLException, ClassNotFoundException
+    {
+        ArrayList<JPanel> filas = new ArrayList();
+        ArrayList<Video> videos = controlador.getVideos();
+        JPanel panelFila;
+        
+        for(int i = 0; i < videos.size(); ++i)
+        {
+            panelFila = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 15));
+            panelFila.setBackground(new Color(127, 127, 127));
+            
+            //La fecha del video
+            panelFila.add(Box.createRigidArea(new Dimension(40, 0)));
+            String fecha = videos.get(i).getDia() + "-" + videos.get(i).getMes() + "-" + videos.get(i).getAño() + " " + videos.get(i).getHora() + ":" + videos.get(i).getMinutos();
+            JBTextField fechaDMA = new JBTextField(fecha);
+            panelFila.add(fechaDMA);
+            
+            //Botono visualizar video
+            panelFila.add(Box.createRigidArea(new Dimension(40, 0)));
+            JBButton boton = new JBButton("Visualizar");
+            boton.addActionListener(new ListenerVisualizarVideo(videos.get(i).getId()));
+            panelFila.add(boton);
+            
+            //Boton eliminar usuario
+            panelFila.add(Box.createRigidArea(new Dimension(40, 0)));
+            JBIconButton eliminar = new JBIconButton(new ImageIcon(System.getProperty("user.dir") + "\\src\\Imagenes\\boton_eliminar.png"));
+            eliminar.addActionListener(new ListenerEliminarVideo(videos.get(i)));
+            panelFila.add(eliminar);
+            
+            filas.add(panelFila);
+            
+            //Separador
+            panelFila = new JPanel();
+            JBSeparator s = new JBSeparator();
+            panelFila.setBackground(new Color(127,127,127));
+            panelFila.add(s);
+            
+            filas.add(panelFila);
+        }
+        
+        return filas;
+    }
+    
+    class ListenerEliminarVideo implements ActionListener
+    {
+        private Video video;
+        
+        public ListenerEliminarVideo(Video video)
+        {
+            this.video = video;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            try {
+                controlador.eliminarVideo(video);
+            } catch (SQLException ex) {
+                Logger.getLogger(VAdministardor.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(VAdministardor.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (ClassNotFoundException ex) {
+                Logger.getLogger(VAdministardor.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (ParseException ex) {
+                Logger.getLogger(VAdministardor.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+    
+    class ListenerVisualizarVideo implements ActionListener
+    {
+        private String id;
+        
+        public ListenerVisualizarVideo(String id)
+        {
+            this.id = id;
+        }
+        
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            try {
+                controlador.visualizarVideo(id);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(VAdministardor.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
     
     @SuppressWarnings("unchecked")
@@ -446,6 +582,11 @@ public class VAdministardor extends javax.swing.JFrame {
         boton_realizar_busqueda.setForeground(new java.awt.Color(255, 255, 255));
         boton_realizar_busqueda.setText("Realizar búsqueda");
         boton_realizar_busqueda.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED, new java.awt.Color(125, 125, 125), new java.awt.Color(125, 125, 125), new java.awt.Color(125, 125, 125), new java.awt.Color(125, 125, 125)));
+        boton_realizar_busqueda.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                boton_realizar_busquedaActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout panel_principal_videosLayout = new javax.swing.GroupLayout(panel_principal_videos);
         panel_principal_videos.setLayout(panel_principal_videosLayout);
@@ -724,8 +865,12 @@ public class VAdministardor extends javax.swing.JFrame {
     }//GEN-LAST:event_popupActionPerformed
 
     private void botonAñadirUsuarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonAñadirUsuarioActionPerformed
-        controlador.añadirUsuarioVisible();
+        controlador.añadirClienteVisible();
     }//GEN-LAST:event_botonAñadirUsuarioActionPerformed
+
+    private void boton_realizar_busquedaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_boton_realizar_busquedaActionPerformed
+        
+    }//GEN-LAST:event_boton_realizar_busquedaActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton botonAñadirUsuario;
