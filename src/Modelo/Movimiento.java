@@ -11,6 +11,7 @@ import java.sql.DriverManager;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.sql.ResultSet;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.logging.Level;
@@ -356,9 +357,31 @@ public class Movimiento{
                 String insertarVideo = "INSERT INTO videos VALUES ('" + fecha + "', '" + Integer.parseInt(año) + "', '" + Integer.parseInt(dia) + "', '" + Integer.parseInt(mes) + 
                                        "', '" + Integer.parseInt(segundos) + "', '" + Integer.parseInt(hora) + "', '" + Integer.parseInt(minutos) + "');";
                 st.executeUpdate(insertarVideo);
+                controlador.getVAdministrar().actualizarPanelVideos();
+                
+                // 3 - se generan las alarmas y se añaden al registro
+                String insertarAlarma = "INSERT INTO alarmas VALUES('" + fecha + "', '" + Integer.parseInt(año) + "', '" + Integer.parseInt(dia) + "', '" + Integer.parseInt(mes) + 
+                       "', '" + Integer.parseInt(segundos) + "');";
+                st.executeUpdate(insertarAlarma);
+                for(int i = 0; i < controlador.getClientes().size(); ++i)
+                {
+                    Cliente cliente = controlador.getClientes().get(i);
+                    String saberEstadoCamara = "SELECT estado FROM camarasclientes WHERE nombreCliente = '" + controlador.getEncriptador().encriptar(cliente.getNombre(), controlador.getAdministrador().getContraseña()) + "'";
+                    ResultSet rs = st.executeQuery(saberEstadoCamara);
+                    String estado = "";
+                    if(rs.next())
+                    {
+                        estado = rs.getString("estado");
+                    }
+                    if(estado.equals("ACTIVADA"))
+                    {
+                        String crearAlarmaCliente = "INSERT INTO alarmasclientes VALUES(' " + cliente.getNombre() + "', '" + fecha + "');";
+                        st.executeUpdate(crearAlarmaCliente);
+                    }
+                }
+                
                 st.close();
                 conexion.close();
-                controlador.getVAdministrar().actualizarPanelVideos();
             } catch (ClassNotFoundException ex) {
                 Logger.getLogger(Movimiento.class.getName()).log(Level.SEVERE, null, ex);
             } catch (SQLException ex) {

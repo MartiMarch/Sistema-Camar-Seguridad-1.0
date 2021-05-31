@@ -9,7 +9,6 @@ import Controlador.Controlador;
 import Modelo.Camara;
 import Modelo.Cliente;
 import Modelo.Video;
-import com.mysql.jdbc.Statement;
 import java.awt.AWTException;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -476,6 +475,8 @@ public class VAdministardor extends javax.swing.JFrame {
         panel_lista_clientes = new javax.swing.JPanel();
         botonAñadirUsuario = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
+        panel_prinicpal_registro = new javax.swing.JPanel();
+        panel_lista_registro = new javax.swing.JPanel();
         menu = new javax.swing.JMenuBar();
         menu_ajustes = new javax.swing.JMenu();
         menuItem_correoTelefono = new javax.swing.JMenuItem();
@@ -525,7 +526,7 @@ public class VAdministardor extends javax.swing.JFrame {
         panel_lista_camaras.setBackground(new java.awt.Color(127, 127, 127));
         panel_lista_camaras.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(83, 83, 83), 2, true));
         panel_lista_camaras.setAutoscrolls(true);
-        panel_lista_camaras.setPreferredSize(new java.awt.Dimension(764, 550));
+        panel_lista_camaras.setPreferredSize(new java.awt.Dimension(730, 550));
 
         javax.swing.GroupLayout panel_lista_camarasLayout = new javax.swing.GroupLayout(panel_lista_camaras);
         panel_lista_camaras.setLayout(panel_lista_camarasLayout);
@@ -554,13 +555,13 @@ public class VAdministardor extends javax.swing.JFrame {
         panel_principal_camarasLayout.setHorizontalGroup(
             panel_principal_camarasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panel_principal_camarasLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(panel_lista_camaras, javax.swing.GroupLayout.DEFAULT_SIZE, 775, Short.MAX_VALUE)
-                .addContainerGap())
-            .addGroup(panel_principal_camarasLayout.createSequentialGroup()
                 .addGap(26, 26, 26)
                 .addComponent(boton_añadirCamara, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(583, Short.MAX_VALUE))
+            .addGroup(panel_principal_camarasLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(panel_lista_camaras, javax.swing.GroupLayout.DEFAULT_SIZE, 732, Short.MAX_VALUE)
+                .addContainerGap())
         );
         panel_principal_camarasLayout.setVerticalGroup(
             panel_principal_camarasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -582,7 +583,7 @@ public class VAdministardor extends javax.swing.JFrame {
         panel_lista_videos.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(83, 83, 83), 2, true));
         panel_lista_videos.setForeground(new java.awt.Color(255, 255, 255));
         panel_lista_videos.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        panel_lista_videos.setPreferredSize(new java.awt.Dimension(764, 550));
+        panel_lista_videos.setPreferredSize(new java.awt.Dimension(730, 550));
 
         javax.swing.GroupLayout panel_lista_videosLayout = new javax.swing.GroupLayout(panel_lista_videos);
         panel_lista_videos.setLayout(panel_lista_videosLayout);
@@ -669,10 +670,10 @@ public class VAdministardor extends javax.swing.JFrame {
                         .addGap(93, 93, 93)
                         .addComponent(boton_realizar_busqueda, javax.swing.GroupLayout.PREFERRED_SIZE, 136, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(texto_fechaFinal))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(134, Short.MAX_VALUE))
             .addGroup(panel_principal_videosLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(panel_lista_videos, javax.swing.GroupLayout.DEFAULT_SIZE, 775, Short.MAX_VALUE)
+                .addComponent(panel_lista_videos, javax.swing.GroupLayout.DEFAULT_SIZE, 732, Short.MAX_VALUE)
                 .addContainerGap())
         );
         panel_principal_videosLayout.setVerticalGroup(
@@ -706,7 +707,7 @@ public class VAdministardor extends javax.swing.JFrame {
         panel_lista_clientes.setBackground(new java.awt.Color(127, 127, 127));
         panel_lista_clientes.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(83, 83, 83), 2, true));
         panel_lista_clientes.setAutoscrolls(true);
-        panel_lista_clientes.setPreferredSize(new java.awt.Dimension(764, 550));
+        panel_lista_clientes.setPreferredSize(new java.awt.Dimension(730, 550));
 
         javax.swing.GroupLayout panel_lista_clientesLayout = new javax.swing.GroupLayout(panel_lista_clientes);
         panel_lista_clientes.setLayout(panel_lista_clientesLayout);
@@ -735,13 +736,13 @@ public class VAdministardor extends javax.swing.JFrame {
         panel_principal_usuariosLayout.setHorizontalGroup(
             panel_principal_usuariosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panel_principal_usuariosLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(panel_lista_clientes, javax.swing.GroupLayout.DEFAULT_SIZE, 775, Short.MAX_VALUE)
-                .addContainerGap())
-            .addGroup(panel_principal_usuariosLayout.createSequentialGroup()
                 .addGap(26, 26, 26)
                 .addComponent(botonAñadirUsuario, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(583, Short.MAX_VALUE))
+            .addGroup(panel_principal_usuariosLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(panel_lista_clientes, javax.swing.GroupLayout.DEFAULT_SIZE, 732, Short.MAX_VALUE)
+                .addContainerGap())
         );
         panel_principal_usuariosLayout.setVerticalGroup(
             panel_principal_usuariosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -766,15 +767,51 @@ public class VAdministardor extends javax.swing.JFrame {
 
         subapartados.addTab("Clientes", jPanel1);
 
+        panel_prinicpal_registro.setBackground(new java.awt.Color(127, 127, 127));
+        panel_prinicpal_registro.setForeground(new java.awt.Color(255, 255, 255));
+
+        panel_lista_registro.setBackground(new java.awt.Color(127, 127, 127));
+        panel_lista_registro.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.LOWERED, new java.awt.Color(83, 83, 83), new java.awt.Color(83, 83, 83), new java.awt.Color(83, 83, 83), new java.awt.Color(83, 83, 83)));
+        panel_lista_registro.setForeground(new java.awt.Color(255, 255, 255));
+        panel_lista_registro.setPreferredSize(new java.awt.Dimension(730, 550));
+
+        javax.swing.GroupLayout panel_lista_registroLayout = new javax.swing.GroupLayout(panel_lista_registro);
+        panel_lista_registro.setLayout(panel_lista_registroLayout);
+        panel_lista_registroLayout.setHorizontalGroup(
+            panel_lista_registroLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 728, Short.MAX_VALUE)
+        );
+        panel_lista_registroLayout.setVerticalGroup(
+            panel_lista_registroLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 546, Short.MAX_VALUE)
+        );
+
+        javax.swing.GroupLayout panel_prinicpal_registroLayout = new javax.swing.GroupLayout(panel_prinicpal_registro);
+        panel_prinicpal_registro.setLayout(panel_prinicpal_registroLayout);
+        panel_prinicpal_registroLayout.setHorizontalGroup(
+            panel_prinicpal_registroLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panel_prinicpal_registroLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(panel_lista_registro, javax.swing.GroupLayout.DEFAULT_SIZE, 732, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        panel_prinicpal_registroLayout.setVerticalGroup(
+            panel_prinicpal_registroLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panel_prinicpal_registroLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(panel_lista_registro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(122, Short.MAX_VALUE))
+        );
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
+            .addComponent(panel_prinicpal_registro, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
+            .addComponent(panel_prinicpal_registro, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         subapartados.addTab("Registro", jPanel2);
@@ -783,7 +820,7 @@ public class VAdministardor extends javax.swing.JFrame {
         panel_fondo.setLayout(panel_fondoLayout);
         panel_fondoLayout.setHorizontalGroup(
             panel_fondoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(subapartados)
+            .addComponent(subapartados, javax.swing.GroupLayout.PREFERRED_SIZE, 748, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
         panel_fondoLayout.setVerticalGroup(
             panel_fondoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -862,9 +899,7 @@ public class VAdministardor extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(panel_fondo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+            .addComponent(panel_fondo, javax.swing.GroupLayout.PREFERRED_SIZE, 748, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -959,10 +994,12 @@ public class VAdministardor extends javax.swing.JFrame {
     private javax.swing.JPanel panel_fondo;
     private javax.swing.JPanel panel_lista_camaras;
     private javax.swing.JPanel panel_lista_clientes;
+    private javax.swing.JPanel panel_lista_registro;
     private javax.swing.JPanel panel_lista_videos;
     private javax.swing.JPanel panel_principal_camaras;
     private javax.swing.JPanel panel_principal_usuarios;
     private javax.swing.JPanel panel_principal_videos;
+    private javax.swing.JPanel panel_prinicpal_registro;
     private java.awt.PopupMenu popup;
     private java.awt.MenuItem popup_Mostrar;
     private java.awt.MenuItem popup_Salir;

@@ -4,9 +4,11 @@ import ClasesAuxiliares.ArchivoConfiguracion;
 import ClasesAuxiliares.Correo;
 import ClasesAuxiliares.Encriptador;
 import Modelo.Administrador;
+import Modelo.Alarma;
 import Modelo.Camara;
 import Modelo.Cliente;
 import Modelo.Movimiento;
+import Modelo.Registro;
 import Modelo.SistemaCamarasSeguridad;
 import Modelo.Video;
 import Vista.AñadirCamara;
@@ -43,6 +45,7 @@ public class Controlador {
     private SistemaCamarasSeguridad scs;
     private String numeroSecretoCorreo = "";
     private Movimiento movimiento;
+    private Registro registro = new Registro();
     
     public Controlador(){}
     
@@ -226,7 +229,7 @@ public class Controlador {
     
     public boolean insertarCamara(String url) throws ClassNotFoundException, SQLException, InterruptedException
     {
-        boolean añadir = administrador.insertarCamara(url, movimiento);
+        boolean añadir = administrador.insertarCamara(url, movimiento, scs.obtenerClientes());
         v_administrador.actualizarPanelCamaras();
         return añadir;
     }
@@ -347,5 +350,10 @@ public class Controlador {
     {
         ArrayList<Video> videos = administrador.buscarVideo(fechaInicial_dia, fechaInicial_mes, fecahInicial_año, fechaFinal_dia, fechaFinal_mes, fechaFinall_año, getVideos());
         v_administrador.actualizarVideosFechas(videos);
+    }
+    
+    public void generarRegistro()
+    {
+        
     }
 }

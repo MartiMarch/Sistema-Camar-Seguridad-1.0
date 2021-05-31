@@ -7,11 +7,14 @@ public class Alarma {
     private int dia;
     private int minuto;
     private int segundos;
-    private String ruta;
     
-    public Alarma(String id)
+    public Alarma(String id, int año, int mes, int dia, int minuto, int segundos)
     {
         this.id = id;
-        
+        this.año = año;
+        this.mes = mes;
+        this.dia = dia;
+        this.minuto = minuto;
+        this.segundos = segundos;
     }
 }

@@ -96,7 +96,7 @@ public class Administrador{
         return identificado;
     }
     
-    public boolean insertarCamara(String url, Movimiento movimiento) throws ClassNotFoundException, SQLException, InterruptedException
+    public boolean insertarCamara(String url, Movimiento movimiento, ArrayList<Cliente> clientes) throws ClassNotFoundException, SQLException, InterruptedException
     {
         boolean insertado = true;
         Pattern rtsp_patron = Pattern.compile("rtsp://((([a-zA-Z0-9_]+):([a-zA-Z0-9_]+)@)?)(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3}).(\\d{1,3})(.*)");
@@ -138,9 +138,15 @@ public class Administrador{
             if(numeroCamaras==0)
             {
                 url = encriptador.encriptar(url, contraseña);
+                movimiento.addCamra(url);
                 String insertarCamara = "INSERT INTO camaras VALUES ('" + url + "')";
                 st.executeUpdate(insertarCamara);
-                movimiento.addCamra(url);
+                String asociarCamCli = null;
+                for(int i = 0; i < clientes.size(); ++i)
+                {
+                    asociarCamCli = "INSERT INTO camarasclientes VALUES(NULL, '" + encriptador.encriptar(clientes.get(i).getNombre(), contraseña) + "', '" + url + "', 'RENOMBRAR CÁMARA', 'ACTIVADA');";
+                    st.executeUpdate(asociarCamCli);
+                }
             }
             else
             {
@@ -269,8 +275,10 @@ public class Administrador{
     {
         nombre = encriptador.encriptar(nombre, contraseña);
         Statement st = conexion().createStatement();
-        String eliminarCamara = "DELETE FROM clientes WHERE nombre = '" + nombre + "'";
-        st.executeUpdate(eliminarCamara);
+        String eliminarCliente = "DELETE FROM clientes WHERE nombre = '" + nombre + "'";
+        st.executeUpdate(eliminarCliente);
+        eliminarCliente = "DELETE FROM camarasclientes WHERE nombre = '" + nombre + "'";
+        st.executeUpdate(eliminarCliente);
         st.close();
     }
     
