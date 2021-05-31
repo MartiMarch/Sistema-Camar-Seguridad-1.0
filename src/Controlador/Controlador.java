@@ -342,4 +342,10 @@ public class Controlador {
     {
         administrador.visualizarVideo(id);
     }
+    
+    public void buscarVideo(String fechaInicial_dia, String fechaInicial_mes, String fecahInicial_año, String fechaFinal_dia, String fechaFinal_mes, String fechaFinall_año) throws ParseException, SQLException, ClassNotFoundException
+    {
+        ArrayList<Video> videos = administrador.buscarVideo(fechaInicial_dia, fechaInicial_mes, fecahInicial_año, fechaFinal_dia, fechaFinal_mes, fechaFinall_año, getVideos());
+        v_administrador.actualizarVideosFechas(videos);
+    }
 }

@@ -10,6 +10,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.ZonedDateTime;
@@ -303,5 +304,150 @@ public class Administrador{
         String ruta = "C:\\SGCSR\\" + id + ".mp4";
         ReproducirVideo rv = new ReproducirVideo(ruta);
         rv.setVisible(true);
+    }
+    
+    public ArrayList<Video> buscarVideo(String fechaInicial_dia, String fechaInicial_mes, String fechaInicial_año, String fechaFinal_dia, String fechaFinal_mes, String fechaFinal_año, ArrayList<Video> videos) throws ParseException, SQLException, ClassNotFoundException
+    {
+        ArrayList<Video> videosAceptados = new ArrayList();
+        if(fechaInicial_dia.equals(""))
+        {
+            fechaInicial_dia = "01";
+        }
+        if(fechaInicial_mes.equals(""))
+        {
+            fechaInicial_mes = "01";
+        }
+        if(fechaInicial_año.equals(""))
+        {
+            fechaInicial_año = "2021";
+        }
+        if(fechaFinal_dia.equals(""))
+        {
+            fechaFinal_dia = "01";
+        }
+        if(fechaFinal_mes.equals(""))
+        {
+            fechaFinal_mes = "01";
+        }
+        if(fechaFinal_año.equals(""))
+        {
+            fechaFinal_año = "2021";
+        }
+        String fechaInicial = fechaInicial_dia + "-" + fechaInicial_mes + "-" + fechaInicial_año;
+        String fechaFinal = fechaFinal_dia + "-" + fechaFinal_mes + "-" + fechaFinal_año;
+        if(validarFecha(fechaInicial, fechaInicial_dia, fechaInicial_mes) && validarFecha(fechaFinal, fechaFinal_dia, fechaFinal_mes))
+        {
+            Date dateFechaInicial = new SimpleDateFormat("dd-MM-yyyy").parse(fechaInicial);
+            Date dateFechaFinal = new SimpleDateFormat("dd-MM-yyyy").parse(fechaFinal);
+            for(int i = 0; i < videos.size(); ++i)
+            {
+                String fechaVideo = videos.get(i).getDia() + "-" + videos.get(i).getMes() + "-" + videos.get(i).getAño();
+                Date dateFechaVideo = new SimpleDateFormat("dd-MM-yyyy").parse(fechaVideo);
+                if(dateFechaVideo.after(dateFechaInicial) && dateFechaVideo.before(dateFechaFinal))
+                {
+                    videosAceptados.add(videos.get(i));
+                }
+            }
+        }
+        else
+        {
+            JOptionPane.showMessageDialog(null, "Las fechas introducidas son incorrectas.");
+        }
+        return videosAceptados;
+    }
+    
+    public boolean validarFecha(String fecha, String dia, String mes)
+    {
+        try{
+            DateFormat df = new SimpleDateFormat("dd-MM-yyyy");
+            df.setLenient(false);
+            df.parse(fecha);
+            boolean validacion = false;
+            int diaNum = Integer.parseInt(dia);
+            switch(mes)
+            {
+                case "01":
+                    if(diaNum >= 1 && diaNum <= 31)
+                    {
+                        validacion = true;
+                    }
+                    break;
+                case "02":
+                    if(diaNum >= 1 && diaNum <= 28)
+                    {
+                        validacion = true;
+                    }
+                    break;
+                case "03":  
+                    if(diaNum >= 1 && diaNum <= 31)
+                    {
+                        validacion = true;
+                    }
+                    break;
+                case "04":
+                    if(diaNum >= 1 && diaNum <= 30)
+                    {
+                        validacion = true;
+                    }
+                    break;
+                case "05":
+                    if(diaNum >= 1 && diaNum <= 31)
+                    {
+                        validacion = true;
+                    }
+                    break;
+                case "06":
+                    if(diaNum >= 1 && diaNum <= 30)
+                    {
+                        validacion = true;
+                    }
+                    break;
+                case "07":
+                    if(diaNum >= 1 && diaNum <= 31)
+                        
+                    {
+                        validacion = true;
+                    }
+                    break;
+                case "08":
+                    if(diaNum >= 1 && diaNum <= 31)
+                    {
+                        validacion = true;
+                    }
+                    break;
+                case "09":
+                    if(diaNum >= 1 && diaNum <= 30)
+                    {
+                        validacion = true;
+                    }
+                    break;
+                case "10":
+                    if(diaNum >= 1 && diaNum <= 31)
+                    {
+                        validacion = true;
+                    }
+                    break;
+                case "11":
+                    if(diaNum >= 1 && diaNum <= 30)
+                    {
+                        validacion = true;
+                    }
+                    break;
+                case "12":
+                    if(diaNum >= 1 && diaNum <= 31)
+                    {
+                        validacion = true;
+                    }
+                    break;
+                default:
+                    break;
+            }
+            
+            return validacion;
+        }
+        catch(ParseException e)
+        {
+            return false;
+        }
     }
 }

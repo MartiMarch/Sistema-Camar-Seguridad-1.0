@@ -347,6 +347,62 @@ public class VAdministardor extends javax.swing.JFrame {
         return filas;
     }
     
+    public void actualizarVideosFechas(ArrayList<Video> videos)
+    {
+        ArrayList<JPanel> filas = new ArrayList();
+        JPanel panelFila;
+        for(int i = 0; i < videos.size(); ++i)
+        {
+            panelFila = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 15));
+            panelFila.setBackground(new Color(127, 127, 127));
+            
+            //La fecha del video
+            panelFila.add(Box.createRigidArea(new Dimension(40, 0)));
+            String fecha = videos.get(i).getDia() + "-" + videos.get(i).getMes() + "-" + videos.get(i).getAño() + " " + videos.get(i).getHora() + ":" + videos.get(i).getMinutos();
+            JBTextField fechaDMA = new JBTextField(fecha);
+            panelFila.add(fechaDMA);
+            
+            //Botono visualizar video
+            panelFila.add(Box.createRigidArea(new Dimension(40, 0)));
+            JBButton boton = new JBButton("Visualizar");
+            boton.addActionListener(new ListenerVisualizarVideo(videos.get(i).getId()));
+            panelFila.add(boton);
+            
+            //Boton eliminar usuario
+            panelFila.add(Box.createRigidArea(new Dimension(40, 0)));
+            JBIconButton eliminar = new JBIconButton(new ImageIcon(System.getProperty("user.dir") + "\\src\\Imagenes\\boton_eliminar.png"));
+            eliminar.addActionListener(new ListenerEliminarVideo(videos.get(i)));
+            panelFila.add(eliminar);
+            
+            filas.add(panelFila);
+            
+            //Separador
+            panelFila = new JPanel();
+            JBSeparator s = new JBSeparator();
+            panelFila.setBackground(new Color(127,127,127));
+            panelFila.add(s);
+            
+            filas.add(panelFila);
+        }
+        JPanel panel = new JPanel();
+        panel.setBackground(new Color(127,127,127));
+        panel.setLayout(new BoxLayout( panel, BoxLayout.Y_AXIS));
+        for(int i = 0; i < filas.size(); ++i)
+        {
+            filas.get(i).setMaximumSize(filas.get(i).getPreferredSize());
+            filas.get(i).setAlignmentX(LEFT_ALIGNMENT);
+            panel.add(filas.get(i));
+        }
+        panel.revalidate();
+        panel.repaint();
+        JBScrollPane scrollPane = new JBScrollPane(panel);
+        panel_lista_videos.removeAll();
+        panel_lista_videos.revalidate();
+        panel_lista_videos.repaint();
+        panel_lista_videos.setLayout(new BorderLayout());
+        panel_lista_videos.add(scrollPane);
+    }
+    
     class ListenerEliminarVideo implements ActionListener
     {
         private Video video;
@@ -408,12 +464,12 @@ public class VAdministardor extends javax.swing.JFrame {
         panel_lista_videos = new javax.swing.JPanel();
         texto_fechaInicial = new javax.swing.JLabel();
         texto_fechaFinal = new javax.swing.JLabel();
-        entrada_fechInicial_dia = new javax.swing.JTextField();
-        entrada_fechInicial_mes = new javax.swing.JTextField();
-        entrada_fechInicial_año = new javax.swing.JTextField();
-        entrada_fechFinal_dia = new javax.swing.JTextField();
-        entrada_fechFinal_mesç = new javax.swing.JTextField();
-        entrada_fechFinall_año = new javax.swing.JTextField();
+        entrada_fechaInicial_dia = new javax.swing.JTextField();
+        entrada_fechaInicial_mes = new javax.swing.JTextField();
+        entrada_fecahInicial_año = new javax.swing.JTextField();
+        entrada_fechaFinal_dia = new javax.swing.JTextField();
+        entrada_fechaFinal_mes = new javax.swing.JTextField();
+        entrada_fechaFinall_año = new javax.swing.JTextField();
         boton_realizar_busqueda = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
         panel_principal_usuarios = new javax.swing.JPanel();
@@ -547,35 +603,35 @@ public class VAdministardor extends javax.swing.JFrame {
         texto_fechaFinal.setForeground(new java.awt.Color(255, 255, 255));
         texto_fechaFinal.setText("Fecha final (dd-mm-aaaa)");
 
-        entrada_fechInicial_dia.setBackground(new java.awt.Color(83, 83, 83));
-        entrada_fechInicial_dia.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        entrada_fechInicial_dia.setForeground(new java.awt.Color(255, 255, 255));
-        entrada_fechInicial_dia.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        entrada_fechaInicial_dia.setBackground(new java.awt.Color(83, 83, 83));
+        entrada_fechaInicial_dia.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        entrada_fechaInicial_dia.setForeground(new java.awt.Color(255, 255, 255));
+        entrada_fechaInicial_dia.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
 
-        entrada_fechInicial_mes.setBackground(new java.awt.Color(83, 83, 83));
-        entrada_fechInicial_mes.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        entrada_fechInicial_mes.setForeground(new java.awt.Color(255, 255, 255));
-        entrada_fechInicial_mes.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        entrada_fechaInicial_mes.setBackground(new java.awt.Color(83, 83, 83));
+        entrada_fechaInicial_mes.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        entrada_fechaInicial_mes.setForeground(new java.awt.Color(255, 255, 255));
+        entrada_fechaInicial_mes.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
 
-        entrada_fechInicial_año.setBackground(new java.awt.Color(83, 83, 83));
-        entrada_fechInicial_año.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        entrada_fechInicial_año.setForeground(new java.awt.Color(255, 255, 255));
-        entrada_fechInicial_año.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        entrada_fecahInicial_año.setBackground(new java.awt.Color(83, 83, 83));
+        entrada_fecahInicial_año.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        entrada_fecahInicial_año.setForeground(new java.awt.Color(255, 255, 255));
+        entrada_fecahInicial_año.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
 
-        entrada_fechFinal_dia.setBackground(new java.awt.Color(83, 83, 83));
-        entrada_fechFinal_dia.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        entrada_fechFinal_dia.setForeground(new java.awt.Color(255, 255, 255));
-        entrada_fechFinal_dia.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        entrada_fechaFinal_dia.setBackground(new java.awt.Color(83, 83, 83));
+        entrada_fechaFinal_dia.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        entrada_fechaFinal_dia.setForeground(new java.awt.Color(255, 255, 255));
+        entrada_fechaFinal_dia.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
 
-        entrada_fechFinal_mesç.setBackground(new java.awt.Color(83, 83, 83));
-        entrada_fechFinal_mesç.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        entrada_fechFinal_mesç.setForeground(new java.awt.Color(255, 255, 255));
-        entrada_fechFinal_mesç.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        entrada_fechaFinal_mes.setBackground(new java.awt.Color(83, 83, 83));
+        entrada_fechaFinal_mes.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        entrada_fechaFinal_mes.setForeground(new java.awt.Color(255, 255, 255));
+        entrada_fechaFinal_mes.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
 
-        entrada_fechFinall_año.setBackground(new java.awt.Color(83, 83, 83));
-        entrada_fechFinall_año.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        entrada_fechFinall_año.setForeground(new java.awt.Color(255, 255, 255));
-        entrada_fechFinall_año.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        entrada_fechaFinall_año.setBackground(new java.awt.Color(83, 83, 83));
+        entrada_fechaFinall_año.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        entrada_fechaFinall_año.setForeground(new java.awt.Color(255, 255, 255));
+        entrada_fechaFinall_año.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
 
         boton_realizar_busqueda.setBackground(new java.awt.Color(83, 83, 83));
         boton_realizar_busqueda.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
@@ -597,19 +653,19 @@ public class VAdministardor extends javax.swing.JFrame {
                 .addGroup(panel_principal_videosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(texto_fechaInicial)
                     .addGroup(panel_principal_videosLayout.createSequentialGroup()
-                        .addComponent(entrada_fechInicial_dia, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(entrada_fechaInicial_dia, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(entrada_fechInicial_mes, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(entrada_fechaInicial_mes, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(entrada_fechInicial_año, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(entrada_fecahInicial_año, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(74, 74, 74)
                 .addGroup(panel_principal_videosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(panel_principal_videosLayout.createSequentialGroup()
-                        .addComponent(entrada_fechFinal_dia, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(entrada_fechaFinal_dia, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(entrada_fechFinal_mesç, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(entrada_fechaFinal_mes, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(entrada_fechFinall_año, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(entrada_fechaFinall_año, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(93, 93, 93)
                         .addComponent(boton_realizar_busqueda, javax.swing.GroupLayout.PREFERRED_SIZE, 136, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(texto_fechaFinal))
@@ -630,13 +686,13 @@ public class VAdministardor extends javax.swing.JFrame {
                     .addComponent(texto_fechaFinal))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(panel_principal_videosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(entrada_fechInicial_dia, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(entrada_fechInicial_mes, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(entrada_fechInicial_año, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(entrada_fechFinal_dia, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(entrada_fechaInicial_dia, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(entrada_fechaInicial_mes, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(entrada_fecahInicial_año, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(entrada_fechaFinal_dia, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(panel_principal_videosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(entrada_fechFinal_mesç, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(entrada_fechFinall_año, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(entrada_fechaFinal_mes, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(entrada_fechaFinall_año, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(boton_realizar_busqueda, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -869,19 +925,27 @@ public class VAdministardor extends javax.swing.JFrame {
     }//GEN-LAST:event_botonAñadirUsuarioActionPerformed
 
     private void boton_realizar_busquedaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_boton_realizar_busquedaActionPerformed
-        
+        try {
+            controlador.buscarVideo(entrada_fechaInicial_dia.getText(), entrada_fechaInicial_mes.getText(), entrada_fecahInicial_año.getText(), entrada_fechaInicial_dia.getText(), entrada_fechaInicial_mes.getText(), entrada_fechaFinall_año.getText());
+        } catch (ParseException ex) {
+            Logger.getLogger(VAdministardor.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(VAdministardor.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(VAdministardor.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_boton_realizar_busquedaActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton botonAñadirUsuario;
     private javax.swing.JButton boton_añadirCamara;
     private javax.swing.JButton boton_realizar_busqueda;
-    private javax.swing.JTextField entrada_fechFinal_dia;
-    private javax.swing.JTextField entrada_fechFinal_mesç;
-    private javax.swing.JTextField entrada_fechFinall_año;
-    private javax.swing.JTextField entrada_fechInicial_año;
-    private javax.swing.JTextField entrada_fechInicial_dia;
-    private javax.swing.JTextField entrada_fechInicial_mes;
+    private javax.swing.JTextField entrada_fecahInicial_año;
+    private javax.swing.JTextField entrada_fechaFinal_dia;
+    private javax.swing.JTextField entrada_fechaFinal_mes;
+    private javax.swing.JTextField entrada_fechaFinall_año;
+    private javax.swing.JTextField entrada_fechaInicial_dia;
+    private javax.swing.JTextField entrada_fechaInicial_mes;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JProgressBar jProgressBar1;
