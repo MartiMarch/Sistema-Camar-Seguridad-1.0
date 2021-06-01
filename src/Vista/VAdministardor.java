@@ -6,6 +6,7 @@ import ComponentesBasicos.JBScrollPane;
 import ComponentesBasicos.JBSeparator;
 import ComponentesBasicos.JBTextField;
 import Controlador.Controlador;
+import Modelo.Alarma;
 import Modelo.Camara;
 import Modelo.Cliente;
 import Modelo.Video;
@@ -21,6 +22,8 @@ import java.awt.event.ActionListener;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -71,6 +74,7 @@ public class VAdministardor extends javax.swing.JFrame {
         actualizarPanelCamaras();
         actualizarPanelClientes();
         actualizarPanelVideos();
+        actualizarPanelRegistro();
     }
     
     private void minimizarIcono()
@@ -446,6 +450,82 @@ public class VAdministardor extends javax.swing.JFrame {
         }
     }
     
+    public void actualizarPanelRegistro() throws SQLException, ClassNotFoundException
+    {
+        ArrayList<JPanel> filas = rellenarFilasRegistro();
+        JPanel panel = new JPanel();
+        panel.setBackground(new Color(127,127,127));
+        panel.setLayout(new BoxLayout( panel, BoxLayout.Y_AXIS));
+        for(int i = 0; i < filas.size(); ++i)
+        {
+            filas.get(i).setMaximumSize(filas.get(i).getPreferredSize());
+            filas.get(i).setAlignmentX(LEFT_ALIGNMENT);
+            panel.add(filas.get(i));
+        }
+        panel.revalidate();
+        panel.repaint();
+        JBScrollPane scrollPane = new JBScrollPane(panel);
+        panel_lista_registro.removeAll();
+        panel_lista_registro.revalidate();
+        panel_lista_registro.repaint();
+        panel_lista_registro.setLayout(new BorderLayout());
+        panel_lista_registro.add(scrollPane);
+    }
+    
+    public ArrayList<JPanel> rellenarFilasRegistro() throws SQLException, ClassNotFoundException
+    {
+        ArrayList<JPanel> filas = new ArrayList();
+        HashMap<String, ArrayList<String>> registro = controlador.getSCS().obtenerRegistro().getHashMap();
+        JPanel panelFila;
+
+        for(Map.Entry<String, ArrayList<String>> i : registro.entrySet())
+        {
+            panelFila = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 15));
+            panelFila.setBackground(new Color(127, 127, 127));
+            String id = i.getKey();
+            ArrayList<String> nomberesClientes = i.getValue();
+            
+            //La fecha de la alarma
+            panelFila.add(Box.createRigidArea(new Dimension(40, 0)));
+            JBTextField fechaAlarma = new JBTextField(id);
+            panelFila.add(fechaAlarma);
+            
+            //Botono visualizar nombre de clientes que han recibido la alarma
+            panelFila.add(Box.createRigidArea(new Dimension(40, 0)));
+            JBButton boton = new JBButton("Clientes que han recibido la alarma");
+            boton.setPreferredSize(new Dimension(250, 31));
+            boton.addActionListener(new ListenerVisualizarClientesAlarmas(nomberesClientes));
+            panelFila.add(boton);
+            
+            filas.add(panelFila);
+            
+            //Separador
+            panelFila = new JPanel();
+            JBSeparator s = new JBSeparator();
+            panelFila.setBackground(new Color(127,127,127));
+            panelFila.add(s);
+            
+            filas.add(panelFila);
+        }
+        
+        return filas;
+    }
+    
+    public class ListenerVisualizarClientesAlarmas implements ActionListener
+    {
+        private ArrayList<String> clientes;
+                
+        public ListenerVisualizarClientesAlarmas(ArrayList<String> clientes)
+        {
+            this.clientes = clientes;
+        }
+        
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            controlador.setVisibleClientesAlarmas(clientes);
+        }
+    }
+                        
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {

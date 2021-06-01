@@ -2,6 +2,7 @@ package Modelo;
 
 import ClasesAuxiliares.ArchivoConfiguracion;
 import ClasesAuxiliares.Encriptador;
+import Vista.AlarmasRecibidas;
 import Vista.ReproducirVideo;
 import Vista.VisualizarCamara;
 import java.io.File;
@@ -457,5 +458,11 @@ public class Administrador{
         {
             return false;
         }
+    }
+    
+    public void VisualizarClientesAlarmas(ArrayList<String> clientes)
+    {
+        AlarmasRecibidas ar = new AlarmasRecibidas(clientes);
+        ar.setVisible(true);
     }
 }

@@ -375,11 +375,10 @@ public class Movimiento{
                     }
                     if(estado.equals("ACTIVADA"))
                     {
-                        String crearAlarmaCliente = "INSERT INTO alarmasclientes VALUES(' " + cliente.getNombre() + "', '" + fecha + "');";
+                        String crearAlarmaCliente = "INSERT INTO alarmasclientes VALUES(0, '" + controlador.getEncriptador().encriptar(cliente.getNombre(), controlador.getAdministrador().getContraseña()) + "', '" + fecha + "');";
                         st.executeUpdate(crearAlarmaCliente);
                     }
                 }
-                
                 st.close();
                 conexion.close();
             } catch (ClassNotFoundException ex) {

@@ -89,4 +89,33 @@ public class SistemaCamarasSeguridad {
         
         return videos;
     }
+    
+    public Registro obtenerRegistro() throws SQLException, ClassNotFoundException
+    {
+        Registro registro = new Registro();
+        Statement STalarmas = (Statement) conexion().createStatement();
+        Statement STalarmasClientes = (Statement) conexion().createStatement();
+        String obtenerAlarmas = "SELECT * FROM alarmas";
+        ResultSet RSalarmas = STalarmas.executeQuery(obtenerAlarmas);
+        ResultSet RSalarmasClientes = null;
+        while(RSalarmas.next())
+        {
+            String id = RSalarmas.getString("id");
+            registro.addAlarma(id);
+            String obtenerAlarmasClientes = "SELECT * FROM alarmasclientes WHERE id = '" + id + "'";
+            RSalarmasClientes = STalarmasClientes.executeQuery(obtenerAlarmasClientes);
+            while(RSalarmasClientes.next())
+            {
+                String nombreCliente = RSalarmasClientes.getString("nombreCliente");
+                nombreCliente = encriptador.desencriptar(nombreCliente, administrador.getContraseña());
+                registro.addClinete(id, nombreCliente);
+            }
+        } 
+        RSalarmas.close();
+        RSalarmasClientes.close();
+        STalarmas.close();
+        STalarmasClientes.close();
+        
+        return registro;
+    }
 }

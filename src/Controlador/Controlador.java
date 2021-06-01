@@ -4,13 +4,13 @@ import ClasesAuxiliares.ArchivoConfiguracion;
 import ClasesAuxiliares.Correo;
 import ClasesAuxiliares.Encriptador;
 import Modelo.Administrador;
-import Modelo.Alarma;
 import Modelo.Camara;
 import Modelo.Cliente;
 import Modelo.Movimiento;
 import Modelo.Registro;
 import Modelo.SistemaCamarasSeguridad;
 import Modelo.Video;
+import Vista.AlarmasRecibidas;
 import Vista.AñadirCamara;
 import Vista.AñadirUsuario;
 import Vista.IniciarSesion;
@@ -108,8 +108,8 @@ public class Controlador {
                 +"nombreCliente VARCHAR(255) NOT NULL, "
                 +"idAlarma VARCHAR(255) NOT NULL, "
                 +"PRIMARY KEY (id),"
-                +"CONSTRAINT fk_ac_cliente FOREIGN KEY (nombreCliente) REFERENCES clientes (nombre), "
-                +"CONSTRAINT fk_ac_alarma FOREIGN KEY (idAlarma) REFERENCES alarmas (id) "
+                +"FOREIGN KEY (nombreCliente) REFERENCES clientes (nombre), "
+                +"FOREIGN KEY (idAlarma) REFERENCES alarmas (id) "
                 + ");";
         
         try { 
@@ -351,9 +351,9 @@ public class Controlador {
         ArrayList<Video> videos = administrador.buscarVideo(fechaInicial_dia, fechaInicial_mes, fecahInicial_año, fechaFinal_dia, fechaFinal_mes, fechaFinall_año, getVideos());
         v_administrador.actualizarVideosFechas(videos);
     }
-    
-    public void generarRegistro()
+
+    public void setVisibleClientesAlarmas(ArrayList<String> clientes)
     {
-        
+        administrador.VisualizarClientesAlarmas(clientes);
     }
 }
