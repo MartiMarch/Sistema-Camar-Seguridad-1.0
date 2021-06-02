@@ -111,8 +111,6 @@ public class SistemaCamarasSeguridad {
                 registro.addClinete(id, nombreCliente);
             }
         } 
-        RSalarmas.close();
-        RSalarmasClientes.close();
         STalarmas.close();
         STalarmasClientes.close();
         
