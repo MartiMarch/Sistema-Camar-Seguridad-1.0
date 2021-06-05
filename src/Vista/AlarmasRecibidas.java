@@ -1,6 +1,5 @@
 package Vista;
 
-import ComponentesBasicos.JBButton;
 import ComponentesBasicos.JBScrollPane;
 import ComponentesBasicos.JBSeparator;
 import ComponentesBasicos.JBTextField;
@@ -34,7 +33,6 @@ public class AlarmasRecibidas extends javax.swing.JFrame {
 
     public void actualizarPanelNombresClientes()
     {
-        
         ArrayList<JPanel> filas = rellenarFilasNombresClientes();
         JPanel panel = new JPanel();
         panel.setBackground(new Color(127,127,127));

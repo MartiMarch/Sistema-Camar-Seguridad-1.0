@@ -6,7 +6,6 @@ import ComponentesBasicos.JBScrollPane;
 import ComponentesBasicos.JBSeparator;
 import ComponentesBasicos.JBTextField;
 import Controlador.Controlador;
-import Modelo.Alarma;
 import Modelo.Camara;
 import Modelo.Cliente;
 import Modelo.Video;

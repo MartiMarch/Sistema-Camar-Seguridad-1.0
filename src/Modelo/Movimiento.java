@@ -325,9 +325,9 @@ public class Movimiento{
         {
             // 1 - Se envía el correo a todos los clientes
             try {
-                for(int i = 0; i < controlador.getClientes().size(); ++i)
+                for(int i = 0; i < controlador.getSCS().obtenerClientes().size(); ++i)
                 {
-                    String correo = controlador.getClientes().get(i).getCorreo();
+                    String correo = controlador.getSCS().obtenerClientes().get(i).getCorreo();
                     Correo enviarCorreo = new Correo();
                     enviarCorreo.enviarCorreo(controlador.getAdministrador().getEmail(), controlador.getAdministrador().getContraseñaCorreo(), correo, 
                             "SGCSR - Movimiento detectado.", 
@@ -349,7 +349,6 @@ public class Movimiento{
             String hora = fecha.substring(11, 13);
             String minutos = fecha.substring(14, 16);
             String segundos = fecha.substring(17, 19);
-            
             try { 
                 Class.forName("com.mysql.jdbc.Driver");
                 Connection conexion = (Connection) DriverManager.getConnection("jdbc:mysql://localhost:3306/sgcsr","root","3+UNO=cuatro");
@@ -366,7 +365,7 @@ public class Movimiento{
                 for(int i = 0; i < controlador.getClientes().size(); ++i)
                 {
                     Cliente cliente = controlador.getClientes().get(i);
-                    String saberEstadoCamara = "SELECT estado FROM camarasclientes WHERE nombreCliente = '" + controlador.getEncriptador().encriptar(cliente.getNombre(), controlador.getAdministrador().getContraseña()) + "'";
+                    String saberEstadoCamara = "SELECT estado FROM camarasclientes WHERE nombreCliente = '" + controlador.getSCS().obtenerClientes().get(i).getNombre() + "'";
                     ResultSet rs = st.executeQuery(saberEstadoCamara);
                     String estado = "";
                     if(rs.next())
@@ -375,7 +374,7 @@ public class Movimiento{
                     }
                     if(estado.equals("ACTIVADA"))
                     {
-                        String crearAlarmaCliente = "INSERT INTO alarmasclientes VALUES(0, '" + controlador.getEncriptador().encriptar(cliente.getNombre(), controlador.getAdministrador().getContraseña()) + "', '" + fecha + "');";
+                        String crearAlarmaCliente = "INSERT INTO alarmasclientes VALUES(NULL, '" + controlador.getSCS().obtenerClientes().get(i).getNombre() + "', '" + fecha + "');";
                         st.executeUpdate(crearAlarmaCliente);
                     }
                 }

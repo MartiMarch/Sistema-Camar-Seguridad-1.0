@@ -3,14 +3,13 @@ package Controlador;
 import ClasesAuxiliares.ArchivoConfiguracion;
 import ClasesAuxiliares.Correo;
 import ClasesAuxiliares.Encriptador;
+import ClasesAuxiliares.SocketServidor;
 import Modelo.Administrador;
 import Modelo.Camara;
 import Modelo.Cliente;
 import Modelo.Movimiento;
-import Modelo.Registro;
 import Modelo.SistemaCamarasSeguridad;
 import Modelo.Video;
-import Vista.AlarmasRecibidas;
 import Vista.AñadirCamara;
 import Vista.AñadirUsuario;
 import Vista.IniciarSesion;
@@ -45,7 +44,7 @@ public class Controlador {
     private SistemaCamarasSeguridad scs;
     private String numeroSecretoCorreo = "";
     private Movimiento movimiento;
-    private Registro registro = new Registro();
+    private SocketServidor ss;
     
     public Controlador(){}
     
@@ -98,8 +97,8 @@ public class Controlador {
                 +"nombreCamara VARCHAR(255), "
                 +"estado VARCHAR(255), "
                 +"PRIMARY KEY (id), "
-                +"CONSTRAINT fk_cc_cliente FOREIGN KEY (nombreCliente) REFERENCES clientes (nombre), "
-                +"CONSTRAINT fk_cc_camara FOREIGN KEY (urlCamara) REFERENCES camaras (url) "
+                +"FOREIGN KEY (nombreCliente) REFERENCES clientes (nombre), "
+                +"FOREIGN KEY (urlCamara) REFERENCES camaras (url) "
                 + ");";
         
         String crear_tablaAlarmasClientes =
@@ -159,7 +158,7 @@ public class Controlador {
         administrador = administrador.registrarAdministrador(contraseña, correo, contraseñaCorreo);
     }
     
-    public boolean iniciarSesionAdministrador(String contraseña) throws AWTException, SQLException, InterruptedException, ClassNotFoundException
+    public boolean iniciarSesionAdministrador(String contraseña) throws AWTException, SQLException, InterruptedException, ClassNotFoundException, IOException
     {
         boolean identificacion = false;
         if(administrador.iniciarSesionAdministrador(contraseña))
@@ -169,6 +168,8 @@ public class Controlador {
             movimiento = new Movimiento(this);
             v_administrador = new VAdministardor(this);
             v_administrador.setVisible(true);
+            ss = new SocketServidor(administrador.getContraseña());
+            new Thread(ss).start();
         }
         return identificacion;
     }
@@ -198,7 +199,7 @@ public class Controlador {
         ResultSet rs = st.executeQuery(obtenerClientes);
         while(rs.next())
         {
-            String nombre = encriptador.desencriptar(rs.getString("nombre"), administrador.getContraseña());
+            String nombre = rs.getString("nombre");
             String email = encriptador.desencriptar(rs.getString("email"), administrador.getContraseña());
             Cliente cliente = new Cliente(nombre, email);
             clientes.add(cliente);
@@ -294,7 +295,7 @@ public class Controlador {
     
     public boolean añadirCliente(String nombre, String correo, String contraseña1, String contraseña2) throws SQLException, ClassNotFoundException
     {
-        boolean resultado = administrador.añadirCliente(nombre, correo, contraseña1, contraseña2);
+        boolean resultado = administrador.añadirCliente(nombre, correo, contraseña1, contraseña2, scs.obtenerCamras());
         v_administrador.actualizarPanelClientes();
         return resultado;
     }

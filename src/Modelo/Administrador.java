@@ -145,7 +145,7 @@ public class Administrador{
                 String asociarCamCli = null;
                 for(int i = 0; i < clientes.size(); ++i)
                 {
-                    asociarCamCli = "INSERT INTO camarasclientes VALUES(NULL, '" + encriptador.encriptar(clientes.get(i).getNombre(), contraseña) + "', '" + url + "', 'RENOMBRAR CÁMARA', 'ACTIVADA');";
+                    asociarCamCli = "INSERT INTO camarasclientes VALUES(NULL, '" + clientes.get(i).getNombre() + "', '" + url + "', 'RENOMBRAR', 'ACTIVADA');";
                     st.executeUpdate(asociarCamCli);
                 }
             }
@@ -246,7 +246,7 @@ public class Administrador{
         return datosCorrectos;
     }
     
-    public boolean añadirCliente(String nombre, String correo, String contraseña1, String contraseña2) throws SQLException, ClassNotFoundException
+    public boolean añadirCliente(String nombre, String correo, String contraseña1, String contraseña2, ArrayList<Camara> camaras) throws SQLException, ClassNotFoundException
     {
         boolean datosCorrectos = false;
         Pattern patronCorreo = Pattern.compile("([a-zA-Z0-9_\\.]+)@([a-zA-Z0-9_\\.]+)\\.([a-zA-Z0-9_\\.]+)");
@@ -256,12 +256,18 @@ public class Administrador{
             datosCorrectos = true;
             
             ArrayList<String> hash = encriptador.generarHash(contraseña1);
-            nombre = encriptador.encriptar(nombre, contraseña);
             correo = encriptador.encriptar(correo, contraseña);
             
             Statement st = conexion().createStatement();
             String insertarCliente = "INSERT INTO clientes VALUES ('" + nombre + "', '" + hash.get(0) + "', '" + hash.get(1) + "', '" + correo + "');";
             st.executeUpdate(insertarCliente);
+            st.close();
+            st = conexion().createStatement();
+            for(int i = 0; i < camaras.size(); ++i)
+            {
+                String asociarCamaraCliente = "INSERT INTO camarasclientes VALUES (NULL, '" + nombre + "', '" + encriptador.encriptar(camaras.get(i).getURL(), contraseña) + "', 'RENOMBRAR', 'ACTIVADA')";
+                st.executeUpdate(asociarCamaraCliente);
+            }
             st.close();
         }
         else
@@ -274,11 +280,10 @@ public class Administrador{
     
     public void eliminarCliente(String nombre) throws SQLException, ClassNotFoundException
     {
-        nombre = encriptador.encriptar(nombre, contraseña);
         Statement st = conexion().createStatement();
-        String eliminarCliente = "DELETE FROM clientes WHERE nombre = '" + nombre + "'";
+        String eliminarCliente = "DELETE FROM camarasclientes WHERE nombreCliente = '" + nombre + "'";
         st.executeUpdate(eliminarCliente);
-        eliminarCliente = "DELETE FROM camarasclientes WHERE nombre = '" + nombre + "'";
+        eliminarCliente = "DELETE FROM clientes WHERE nombre = '" + nombre + "'";
         st.executeUpdate(eliminarCliente);
         st.close();
     }

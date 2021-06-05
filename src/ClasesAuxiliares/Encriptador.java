@@ -7,9 +7,6 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
 public class Encriptador {
-
-    private SecretKeySpec secreto;
-    private byte[] clave;
     private String digitos = "AaEeIiOoUuBbCcDdFfGgHhJjKkLlMmNnÑnPpQqRrSsTtVvWwXxYyZz1234567890?¿<>*-+=[]{}:,;_";
     private static int LONGITUD_SECRETO = 16;
     
@@ -93,7 +90,7 @@ public class Encriptador {
         {
             clave =  clave.substring(0, LONGITUD_SECRETO);
         }
-
+        
         return clave;
     }
 }

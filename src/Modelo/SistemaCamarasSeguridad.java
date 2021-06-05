@@ -55,7 +55,6 @@ public class SistemaCamarasSeguridad {
         while(rs.next())
         {
             String nombre = rs.getString("nombre");
-            nombre = encriptador.desencriptar(nombre, administrador.getContraseña());
             String correo = rs.getString("email");
             correo = encriptador.desencriptar(correo, administrador.getContraseña());
             Cliente cliente = new Cliente(nombre, correo);
