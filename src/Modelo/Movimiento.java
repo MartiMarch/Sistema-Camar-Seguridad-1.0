@@ -380,6 +380,10 @@ public class Movimiento{
                 }
                 st.close();
                 conexion.close();
+                
+                // 3 - Se ctualiza el panel de los registros
+                controlador.getVAdministrar().actualizarPanelRegistro();
+                
             } catch (ClassNotFoundException ex) {
                 Logger.getLogger(Movimiento.class.getName()).log(Level.SEVERE, null, ex);
             } catch (SQLException ex) {

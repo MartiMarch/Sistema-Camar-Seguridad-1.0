@@ -101,12 +101,11 @@ public class SistemaCamarasSeguridad {
         {
             String id = RSalarmas.getString("id");
             registro.addAlarma(id);
-            String obtenerAlarmasClientes = "SELECT * FROM alarmasclientes WHERE id = '" + id + "'";
+            String obtenerAlarmasClientes = "SELECT * FROM alarmasclientes WHERE idAlarma = '" + id + "'";
             RSalarmasClientes = STalarmasClientes.executeQuery(obtenerAlarmasClientes);
             while(RSalarmasClientes.next())
             {
                 String nombreCliente = RSalarmasClientes.getString("nombreCliente");
-                nombreCliente = encriptador.desencriptar(nombreCliente, administrador.getContraseña());
                 registro.addClinete(id, nombreCliente);
             }
         } 
