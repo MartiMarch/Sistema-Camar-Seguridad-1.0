@@ -8,15 +8,16 @@ import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class SocketServidor extends Thread{
-    private final int PORT = 6050;
+public class SocketCorreo extends Thread{
+    private final int PORT = 6060;
     private ServerSocket serverSocket;
-    private String contraseña;
+    private String correo, contraseñaCorreo;
     
-    public SocketServidor(String contraseña) throws IOException
+    public SocketCorreo(String correo, String contraseñaCorreo) throws IOException
     {
         this.serverSocket = new ServerSocket(PORT);
-        this.contraseña = contraseña;
+        this.correo = correo;
+        this.contraseñaCorreo = contraseñaCorreo;
     }
     
     @Override
@@ -24,16 +25,19 @@ public class SocketServidor extends Thread{
     {
         while(true)
         {
+            Socket socket = null;
             try {
-                Socket socket = serverSocket.accept();
+                socket = serverSocket.accept();
                 OutputStream output = socket.getOutputStream();
                 PrintWriter writer = new PrintWriter(output, true);
-                writer.println(contraseña);
-                output.close();
+                writer.println(correo);
+                writer.flush();
+                writer.println(contraseñaCorreo);
                 writer.close();
+                output.close();
                 socket.close();
             } catch (IOException ex) {
-                Logger.getLogger(SocketServidor.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(SocketCorreo.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }

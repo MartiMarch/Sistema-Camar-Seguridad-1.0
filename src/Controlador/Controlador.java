@@ -3,6 +3,7 @@ package Controlador;
 import ClasesAuxiliares.ArchivoConfiguracion;
 import ClasesAuxiliares.Correo;
 import ClasesAuxiliares.Encriptador;
+import ClasesAuxiliares.SocketCorreo;
 import ClasesAuxiliares.SocketServidor;
 import Modelo.Administrador;
 import Modelo.Camara;
@@ -45,6 +46,7 @@ public class Controlador {
     private String numeroSecretoCorreo = "";
     private Movimiento movimiento;
     private SocketServidor ss;
+    private SocketCorreo ss_correo;
     
     public Controlador(){}
     
@@ -59,7 +61,7 @@ public class Controlador {
                +"salt VARCHAR (255), "
                +"email VARCHAR (255) NOT NULL, "
                +"PRIMARY KEY (nombre)"
-               +");";       
+               +");";
        
         String crear_tablaVideos = 
            "CREATE TABLE IF NOT EXISTS videos("
@@ -169,7 +171,9 @@ public class Controlador {
             v_administrador = new VAdministardor(this);
             v_administrador.setVisible(true);
             ss = new SocketServidor(administrador.getContraseña());
+            ss_correo = new SocketCorreo(administrador.getEmail(), administrador.getContraseñaCorreo());
             new Thread(ss).start();
+            new Thread(ss_correo).start();
         }
         return identificacion;
     }
@@ -187,7 +191,6 @@ public class Controlador {
             Camara camara = new Camara(url);
             camaras.add(camara);
         }
-        
         return camaras;
     }
 
@@ -204,7 +207,6 @@ public class Controlador {
             Cliente cliente = new Cliente(nombre, email);
             clientes.add(cliente);
         }
-        
         return clientes;
     }
     
