@@ -939,7 +939,7 @@ public class VAdministardor extends javax.swing.JFrame {
 
         menuItem_modificarRuta.setBackground(new java.awt.Color(83, 83, 83));
         menuItem_modificarRuta.setForeground(new java.awt.Color(255, 255, 255));
-        menuItem_modificarRuta.setText("Modifcar ruta");
+        menuItem_modificarRuta.setText("Seleccionar algoritmo");
         menuItem_modificarRuta.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
         menuItem_modificarRuta.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1015,7 +1015,7 @@ public class VAdministardor extends javax.swing.JFrame {
     }//GEN-LAST:event_menuItem_correoTelefonoActionPerformed
 
     private void menuItem_modificarRutaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItem_modificarRutaActionPerformed
-
+        controlador.setVisibleCambiarAlgoritmo();
     }//GEN-LAST:event_menuItem_modificarRutaActionPerformed
 
     private void boton_añadirCamaraActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_boton_añadirCamaraActionPerformed

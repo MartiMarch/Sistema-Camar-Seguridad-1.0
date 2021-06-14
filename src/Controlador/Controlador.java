@@ -13,6 +13,7 @@ import Modelo.SistemaCamarasSeguridad;
 import Modelo.Video;
 import Vista.AñadirCamara;
 import Vista.AñadirUsuario;
+import Vista.CambiarAlgoritmo;
 import Vista.IniciarSesion;
 import Vista.ModificarContraseña;
 import Vista.ModificarCorreo;
@@ -41,6 +42,7 @@ public class Controlador {
     private ModificarCorreo modificarCorreo = new ModificarCorreo();
     private ModificarContraseña modificarContraseña = new ModificarContraseña();
     private AñadirUsuario añadirUsuario = new AñadirUsuario();
+    private CambiarAlgoritmo cambiarAlgoritmo = new CambiarAlgoritmo();
     private Correo correo = new Correo();
     private SistemaCamarasSeguridad scs;
     private String numeroSecretoCorreo = "";
@@ -358,5 +360,10 @@ public class Controlador {
     public void setVisibleClientesAlarmas(ArrayList<String> clientes)
     {
         administrador.VisualizarClientesAlarmas(clientes);
+    }
+    
+    public void setVisibleCambiarAlgoritmo()
+    {
+        cambiarAlgoritmo.setVisible(true);
     }
 }
