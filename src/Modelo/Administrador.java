@@ -164,10 +164,10 @@ public class Administrador{
     {
         url = encriptador.encriptar(url, contraseña);
         Statement st = conexion().createStatement();
-        String eliminarCamara = "DELETE FROM camaras WHERE url = '" + url + "'";
-        st.executeUpdate(eliminarCamara);
         String eliminarAsociaciones = "DELETE FROM camarasclientes WHERE urlCamara = '" + url + "'";
         st.executeUpdate(eliminarAsociaciones);
+        String eliminarCamara = "DELETE FROM camaras WHERE url = '" + url + "'";
+        st.executeUpdate(eliminarCamara);
         st.close();
         movimiento.finalizarHilos(url);
     }
@@ -282,6 +282,8 @@ public class Administrador{
     {
         Statement st = conexion().createStatement();
         String eliminarCliente = "DELETE FROM camarasclientes WHERE nombreCliente = '" + nombre + "'";
+        st.executeUpdate(eliminarCliente);
+        eliminarCliente = "DELETE FROM alarmasclientes WHERE nombreCliente = '" + nombre + "'";
         st.executeUpdate(eliminarCliente);
         eliminarCliente = "DELETE FROM clientes WHERE nombre = '" + nombre + "'";
         st.executeUpdate(eliminarCliente);
@@ -469,5 +471,10 @@ public class Administrador{
     {
         AlarmasRecibidas ar = new AlarmasRecibidas(clientes);
         ar.setVisible(true);
+    }
+    
+    public void cambiarAlgoritmo(Movimiento movimiento, boolean seleccion)
+    {
+        movimiento.cambiarAlgorimto(seleccion);
     }
 }

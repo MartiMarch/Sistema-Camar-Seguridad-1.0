@@ -1,8 +1,11 @@
 package Vista;
 
+import Controlador.Controlador;
 import javax.swing.WindowConstants;
 
 public class CambiarAlgoritmo extends javax.swing.JFrame {
+    private Controlador controlador;
+    
     public CambiarAlgoritmo(){
         initComponents();
         
@@ -17,6 +20,11 @@ public class CambiarAlgoritmo extends javax.swing.JFrame {
         this.rdioButton_FO.setFocusable(false);
     }
 
+    public void setControlador(Controlador controlador)
+    {
+        this.controlador = controlador;
+    }
+    
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -56,6 +64,11 @@ public class CambiarAlgoritmo extends javax.swing.JFrame {
         botonGurdarSeleccion.setForeground(new java.awt.Color(255, 255, 255));
         botonGurdarSeleccion.setText("Guardar selección");
         botonGurdarSeleccion.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED, new java.awt.Color(127, 127, 127), new java.awt.Color(127, 127, 127), new java.awt.Color(127, 127, 127), new java.awt.Color(127, 127, 127)));
+        botonGurdarSeleccion.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                botonGurdarSeleccionActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout panelOpcionesAlgoritmoLayout = new javax.swing.GroupLayout(panelOpcionesAlgoritmo);
         panelOpcionesAlgoritmo.setLayout(panelOpcionesAlgoritmoLayout);
@@ -118,6 +131,20 @@ public class CambiarAlgoritmo extends javax.swing.JFrame {
     private void radioButton_EFActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_radioButton_EFActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_radioButton_EFActionPerformed
+
+    private void botonGurdarSeleccionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonGurdarSeleccionActionPerformed
+        boolean seleccion = true;
+        if(radioButton_EF.isSelected())
+        {
+           seleccion = true; 
+        }
+        else if(rdioButton_FO.isSelected())
+        {
+            seleccion = false;
+        }
+        controlador.cambiarAlgoritmo(seleccion);
+        setVisible(false);
+    }//GEN-LAST:event_botonGurdarSeleccionActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton botonGurdarSeleccion;

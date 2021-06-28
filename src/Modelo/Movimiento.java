@@ -18,11 +18,19 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.mail.MessagingException;
 import org.opencv.core.Core;
+import org.opencv.core.KeyPoint;
 import org.opencv.core.Mat;
+import org.opencv.core.MatOfByte;
+import org.opencv.core.MatOfFloat;
+import org.opencv.core.MatOfKeyPoint;
 import org.opencv.core.MatOfPoint;
+import org.opencv.core.MatOfPoint2f;
 import org.opencv.core.Point;
 import org.opencv.core.Size;
+import org.opencv.core.TermCriteria;
+import org.opencv.features2d.ORB;
 import org.opencv.imgproc.Imgproc;
+import org.opencv.video.Video;
 import org.opencv.videoio.VideoCapture;
 import org.opencv.videoio.VideoWriter;
 import org.opencv.videoio.Videoio;
@@ -142,6 +150,8 @@ public class Movimiento{
         private String url;
         private Controlador controlador;
         private volatile boolean ejecucion = true;
+        private volatile boolean algoritmo = true;
+        private ORB orb = ORB.create(100);
         
         public HWrite(double fps, int w, int h, Controlador controlador, String url, BlockingQueue queue)
         {
@@ -169,86 +179,189 @@ public class Movimiento{
                 int cambiarReferencia = 0;
                 int cerrarVideo = 0;
                 boolean movimiento = false;
+                double tiempoInicial = getTime();
+                EsquinasValidas ev = null;
+                try {
+                    ev = obtenerEsquinasValidas();
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(Movimiento.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                
                 while(ejecucion)
                 {
                     if(!queue.isEmpty())
                     {
-                        if(cambiarReferencia == 60)
+                        if(algoritmo)
                         {
-                            primerFrame.release();
-                            try{
-                                primerFrame = reiniciarFrame((Mat) queue.take());
+                            if(cambiarReferencia == 60)
+                            {
+                                primerFrame.release();
+                                try{
+                                    primerFrame = reiniciarFrame((Mat) queue.take());
+                                } catch (InterruptedException ex) {
+                                    Logger.getLogger(Movimiento.class.getName()).log(Level.SEVERE, null, ex);
+                                }
+                            }
+                            ++cambiarReferencia;
+                            
+                            //Se transforma la imagen de la camara a una imagen gris
+                            Mat imagen = null;
+                            Mat imagenGris = new Mat();
+                            try {
+                                imagen = (Mat) queue.take();
                             } catch (InterruptedException ex) {
                                 Logger.getLogger(Movimiento.class.getName()).log(Level.SEVERE, null, ex);
                             }
-                        }
-                        ++cambiarReferencia;
+                            Imgproc.cvtColor(imagen, imagenGris, Imgproc.COLOR_BGR2GRAY);
 
-                        //Se transforma la imagen de la camara a una imagen gris
-                        Mat imagen = null;
-                        Mat imagenGris = new Mat();
-                        try {
-                            imagen = (Mat) queue.take();
-                        } catch (InterruptedException ex) {
-                            Logger.getLogger(Movimiento.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-                        Imgproc.cvtColor(imagen, imagenGris, Imgproc.COLOR_BGR2GRAY);
+                            //Se hace borrosa la imagen para que sea mas facil detectar el movimiento
+                            Mat imagenBorrosa = new Mat();
+                            Imgproc.GaussianBlur(imagenGris, imagenBorrosa, new Size(21, 21), 0);
 
-                        //Se hace borrosa la imagen para que sea mas facil detectar el movimiento
-                        Mat imagenBorrosa = new Mat();
-                        Imgproc.GaussianBlur(imagenGris, imagenBorrosa, new Size(21, 21), 0);
+                            //Comparamos la imagen mediante el algoritmo absdiff y creamos una imagen de pixeles blancos y negros
+                            Mat imagenComparacion = new Mat();
+                            Core.absdiff(primerFrame, imagenBorrosa, imagenComparacion);
 
-                        //Comparamos la imagen mediante el algoritmo absdiff y creamos una imagen de pixeles blancos y negros
-                        Mat imagenComparacion = new Mat();
-                        Core.absdiff(primerFrame, imagenBorrosa, imagenComparacion);
+                            //En una imagen pasada a grises se busca los pixeles más intensos
+                            Mat pixelesIntensos = new Mat();
+                            Imgproc.threshold(imagenComparacion, pixelesIntensos, 30, 255, Imgproc.THRESH_BINARY);
+                            Mat kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(3,3));
+                            Imgproc.dilate(pixelesIntensos, pixelesIntensos, kernel, new Point(-1,-1), 2);
 
-                        //En una imagen pasada a grises se busca los pixeles más intensos
-                        Mat pixelesIntensos = new Mat();
-                        Imgproc.threshold(imagenComparacion, pixelesIntensos, 30, 255, Imgproc.THRESH_BINARY);
-                        Mat kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(3,3));
-                        Imgproc.dilate(pixelesIntensos, pixelesIntensos, kernel, new Point(-1,-1), 2);
+                            //Sebuscan los bordes
+                            List<MatOfPoint> bordes = new ArrayList<>();
+                            Imgproc.findContours(pixelesIntensos, bordes, pixelesIntensos, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
 
-                        //Sebuscan los bordes
-                        List<MatOfPoint> bordes = new ArrayList<>();
-                        Imgproc.findContours(pixelesIntensos, bordes, pixelesIntensos, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
-
-                        if(bordes.size() == 0)
-                        {
-                            ++cerrarVideo;
-                        }
-                        for(int i = 0; i <  bordes.size(); ++i)
-                        {
-                            //Si el valor es muy pequeño la sensibilidad es emnor
-                            if(Imgproc.contourArea(bordes.get(i))<100)
+                            if(bordes.size() == 0)
                             {
-                                if(!movimiento)
+                                ++cerrarVideo;
+                            }
+                            for(int i = 0; i <  bordes.size(); ++i)
+                            {
+                                //Si el valor es muy pequeño la sensibilidad es emnor
+                                if(Imgproc.contourArea(bordes.get(i))<100)
                                 {
-                                    salida = crearVideo();
-                                    HTareas enviarCorreos = new HTareas(controlador, nombreArchivo);
-                                    new Thread(enviarCorreos).start();
+                                    if(!movimiento)
+                                    {
+                                        salida = crearVideo();
+                                        HTareas enviarCorreos = new HTareas(controlador, nombreArchivo);
+                                        new Thread(enviarCorreos).start();
+                                    }
+                                    movimiento = true;
+                                    salida.write(imagenGris);
                                 }
-                                movimiento = true;
-                                salida.write(imagenGris);
+                            }
+                            if(cerrarVideo == 60)
+                            {
+                                salida.release();
+                                cerrarVideo = 0;
+                                movimiento = false;
+                                nombreArchivo = null;
+                            }
+
+                            //IMPORTANTE: si no se liberan los recursoso el consumo de RAM es muy grande.
+                            imagen.release();
+                            imagenGris.release();
+                            imagenBorrosa.release();
+                            imagenComparacion.release();
+                            pixelesIntensos.release();
+                            kernel.release();
+                        }
+                        else
+                        {
+                            try
+                            {
+                                Mat imagen = (Mat) queue.take();
+                                
+                                Mat imagen1 = imagen.submat(0, (int) imagen.rows()/2, 0, (int) imagen.cols()/2);
+                                Mat imagen2 = imagen.submat(0, (int) imagen.rows()/2, (int) imagen.cols()/2, (int) imagen.cols());
+                                Mat imagen3 = imagen.submat((int) imagen.rows()/2, (int) imagen.rows(), 0, (int) imagen.cols()/2);
+                                Mat imagen4 = imagen.submat((int) imagen.rows()/2, (int) imagen.rows(), (int) imagen.cols()/2, (int) imagen.cols());
+                                
+                                Mat imagenGris = new Mat();
+                                Imgproc.cvtColor(imagen, imagenGris, Imgproc.COLOR_BGR2GRAY);
+                                
+                                Mat imagenGris1 = imagenGris.submat(0, (int) imagenGris.rows()/2, 0, (int) imagenGris.cols()/2);
+                                Mat imagenGris2 = imagenGris.submat(0, (int) imagenGris.rows()/2, (int) imagenGris.cols()/2, (int) imagenGris.cols());
+                                Mat imagenGris3 = imagenGris.submat((int) imagenGris.rows()/2, (int) imagenGris.rows(), 0, (int) imagenGris.cols()/2);
+                                Mat imagenGris4 = imagenGris.submat((int) imagenGris.rows()/2, (int) imagenGris.rows(), (int) imagenGris.cols()/2, (int) imagenGris.cols());
+                                
+                                MatOfPoint2f nuevasEsquinas1 = new MatOfPoint2f();
+                                MatOfPoint2f nuevasEsquinas2 = new MatOfPoint2f();
+                                MatOfPoint2f nuevasEsquinas3 = new MatOfPoint2f();
+                                MatOfPoint2f nuevasEsquinas4 = new MatOfPoint2f();
+                                       
+                                MatOfByte estatus1 = new MatOfByte();
+                                MatOfByte estatus2 = new MatOfByte();
+                                MatOfByte estatus3 = new MatOfByte();
+                                MatOfByte estatus4 = new MatOfByte();
+                                
+                                MatOfFloat error1 = new MatOfFloat();
+                                MatOfFloat error2 = new MatOfFloat();
+                                MatOfFloat error3 = new MatOfFloat();
+                                MatOfFloat error4 = new MatOfFloat();
+                                
+                                Video.calcOpticalFlowPyrLK(ev.imagenesIniciales.get(0), imagenGris1, ev.esquinasIniciales.get(0), nuevasEsquinas1, estatus1, error1, new Size(15, 15), 2, new TermCriteria(TermCriteria.COUNT + TermCriteria.EPS, 10, 0.03));
+                                Video.calcOpticalFlowPyrLK(ev.imagenesIniciales.get(1), imagenGris2, ev.esquinasIniciales.get(1), nuevasEsquinas2, estatus2, error2, new Size(15, 15), 2, new TermCriteria(TermCriteria.COUNT + TermCriteria.EPS, 10, 0.03));
+                                Video.calcOpticalFlowPyrLK(ev.imagenesIniciales.get(2), imagenGris3, ev.esquinasIniciales.get(2), nuevasEsquinas3, estatus3, error3, new Size(15, 15), 2, new TermCriteria(TermCriteria.COUNT + TermCriteria.EPS, 10, 0.03));
+                                Video.calcOpticalFlowPyrLK(ev.imagenesIniciales.get(3), imagenGris4, ev.esquinasIniciales.get(3), nuevasEsquinas4, estatus4, error4, new Size(15, 15), 2, new TermCriteria(TermCriteria.COUNT + TermCriteria.EPS, 10, 0.03));
+                                
+                                if(!revisarEstatus(estatus1.toArray()) || !revisarEstatus(estatus2.toArray()) || !revisarEstatus(estatus3.toArray()) || !revisarEstatus(estatus4.toArray()))
+                                {
+                                    System.out.println("MOVIMIENTO\n");
+                                }
+                                
+                                double tiempoActual = getTime();
+                                if(tiempoActual - tiempoInicial >= 900000)
+                                {
+                                    tiempoActual = tiempoInicial;
+                                    ev = obtenerEsquinasValidas();
+                                }
+                                
+                                imagen.release();
+                                imagen1.release();
+                                imagen2.release();
+                                imagen3.release();
+                                imagen4.release();
+                                imagenGris.release();
+                                imagenGris1.release();
+                                imagenGris2.release();
+                                imagenGris3.release();
+                                imagenGris4.release();
+                                nuevasEsquinas1.release();
+                                nuevasEsquinas2.release();
+                                nuevasEsquinas3.release();
+                                nuevasEsquinas4.release();
+                                estatus1.release();
+                                estatus2.release();
+                                estatus3.release();
+                                estatus4.release();
+                                error1.release();
+                                error2.release();
+                                error3.release();
+                                error4.release();
+                            }
+                            catch(InterruptedException ex)
+                            {
+                                Logger.getLogger(Movimiento.class.getName()).log(Level.SEVERE, null, ex);
                             }
                         }
-                        if(cerrarVideo == 60)
-                        {
-                            salida.release();
-                            cerrarVideo = 0;
-                            movimiento = false;
-                            nombreArchivo = null;
-                        }
-
-                        //IMPORTANTE: si no se liberan los recursoso el consumo de RAM es muy grande.
-                        imagen.release();
-                        imagenGris.release();
-                        imagenBorrosa.release();
-                        imagenComparacion.release();
-                        pixelesIntensos.release();
-                        kernel.release();
                     }
                 }
             }
+        }
+        
+        public boolean revisarEstatus(byte estatus[])
+        {
+            boolean movimiento = false;
+            for(int i = 0; i < estatus.length && !movimiento; ++i)
+            {
+                if(estatus[i] == 0)
+                {
+                   movimiento = true;
+                }
+            }
+            return movimiento;
         }
         
         public Mat reiniciarFrame(Mat frame)
@@ -281,6 +394,101 @@ public class Movimiento{
         {
             ejecucion = false;
             Thread.sleep(100);
+        }
+        
+        public void cambiarAlgoritmo(boolean algoritmo)
+        {
+            this.algoritmo = algoritmo;
+        }
+        
+        public MatOfPoint2f toMatOfPoint2f(MatOfKeyPoint entrada)
+        {
+            KeyPoint[] puntosClave = entrada.toArray();
+            ArrayList<Point> puntos = new ArrayList();
+            for(int i = 0; i < puntosClave.length; ++i)
+            {
+                puntos.add(puntosClave[i].pt);
+            }
+            MatOfPoint resultado = new MatOfPoint();
+            resultado.fromList(puntos);
+            return new MatOfPoint2f(resultado.toArray());
+        }
+        
+        public MatOfPoint2f procesarEsquinasInicialesSubimagen(Mat subimagen)
+        {
+            MatOfKeyPoint esquinasIniciales = new MatOfKeyPoint();
+            orb.detect(subimagen, esquinasIniciales);
+            subimagen.release();
+            return toMatOfPoint2f(esquinasIniciales);
+        }
+        
+        public double getTime()
+        {
+            return System.currentTimeMillis();
+        }
+        
+        class EsquinasValidas
+        {
+            public ArrayList<MatOfPoint2f> esquinasIniciales = new ArrayList();
+            public ArrayList<Mat> imagenesIniciales = new ArrayList();
+            public EsquinasValidas(){}
+            public ArrayList<MatOfPoint2f> getEsquinasIniciales()
+            {
+                return esquinasIniciales;
+            }
+            public ArrayList<Mat> getImagenesIniciales()
+            {
+                return imagenesIniciales;
+            }
+        }
+        
+        public EsquinasValidas obtenerEsquinasValidas() throws InterruptedException
+        {
+            EsquinasValidas ev = new EsquinasValidas();
+            MatOfPoint2f esquinasIniciales1 = new MatOfPoint2f();
+            MatOfPoint2f esquinasIniciales2 = new MatOfPoint2f();
+            MatOfPoint2f esquinasIniciales3 = new MatOfPoint2f();
+            MatOfPoint2f esquinasIniciales4 = new MatOfPoint2f();
+            while(esquinasIniciales1.empty() || esquinasIniciales2.empty() || esquinasIniciales3.empty() || esquinasIniciales4.empty())
+            {
+                Mat primeraImagen = (Mat) queue.take();
+                Mat primeraImagenGris = new Mat();
+                Imgproc.cvtColor(primeraImagen, primeraImagenGris, Imgproc.COLOR_BGR2GRAY);
+            
+                ev.esquinasIniciales.clear();
+                ev.imagenesIniciales.clear();
+                
+                Mat primeraImagenGris1 = primeraImagenGris.submat(0, (int) primeraImagenGris.rows()/2, 0, (int) primeraImagenGris.cols()/2);
+                Mat primeraImagenGris2 = primeraImagenGris.submat(0, (int) primeraImagenGris.rows()/2, (int) primeraImagenGris.cols()/2, (int) primeraImagenGris.cols());
+                Mat primeraImagenGris3 = primeraImagenGris.submat((int) primeraImagenGris.rows()/2, (int) primeraImagenGris.rows(), 0, (int) primeraImagenGris.cols()/2);
+                Mat primeraImagenGris4 = primeraImagenGris.submat((int) primeraImagenGris.rows()/2, (int) primeraImagenGris.rows(), (int) primeraImagenGris.cols()/2, (int) primeraImagenGris.cols());
+                
+                esquinasIniciales1 = procesarEsquinasInicialesSubimagen(primeraImagenGris1);
+                esquinasIniciales2 = procesarEsquinasInicialesSubimagen(primeraImagenGris2);
+                esquinasIniciales3 = procesarEsquinasInicialesSubimagen(primeraImagenGris3);
+                esquinasIniciales4 = procesarEsquinasInicialesSubimagen(primeraImagenGris4);
+                
+                ev.imagenesIniciales.add(primeraImagenGris1);
+                ev.imagenesIniciales.add(primeraImagenGris2);
+                ev.imagenesIniciales.add(primeraImagenGris3);
+                ev.imagenesIniciales.add(primeraImagenGris4);
+                
+                ev.esquinasIniciales.add(esquinasIniciales1);
+                ev.esquinasIniciales.add(esquinasIniciales2);
+                ev.esquinasIniciales.add(esquinasIniciales3);
+                ev.esquinasIniciales.add(esquinasIniciales4);
+                
+                primeraImagenGris1.release();
+                primeraImagenGris2.release();
+                primeraImagenGris3.release();
+                primeraImagenGris4.release();
+            }
+            esquinasIniciales1.release();
+            esquinasIniciales2.release();
+            esquinasIniciales3.release();
+            esquinasIniciales4.release();
+            
+            return ev;
         }
     }
     
@@ -391,6 +599,14 @@ public class Movimiento{
             } catch (InterruptedException ex) {
                 Logger.getLogger(Movimiento.class.getName()).log(Level.SEVERE, null, ex);
             }
+        }
+    }
+    
+    public void cambiarAlgorimto(boolean seleccion)
+    {
+        for(int i = 0; i < hilosEscribir.size(); ++i)
+        {
+            hilosEscribir.get(i).cambiarAlgoritmo(seleccion);
         }
     }
 }

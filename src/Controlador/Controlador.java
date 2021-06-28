@@ -365,5 +365,11 @@ public class Controlador {
     public void setVisibleCambiarAlgoritmo()
     {
         cambiarAlgoritmo.setVisible(true);
+        cambiarAlgoritmo.setControlador(this);
+    }
+    
+    public void cambiarAlgoritmo(boolean seleccion)
+    {
+        administrador.cambiarAlgoritmo(movimiento, seleccion);
     }
 }
